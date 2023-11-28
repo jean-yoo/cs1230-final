@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { setupControlPanel } from './ParamsControl'
 import { particleSystems, generateSnowParticles } from './SnowParticles'
+import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+
 // Setup scene
 const scene = new THREE.Scene()
 
@@ -13,10 +15,15 @@ const camera = new THREE.PerspectiveCamera(
     window.innerWidth / window.innerHeight, // aspect ratio
     0.1, 1000); // near and far planes
 
+
 // Setup renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
+
+// Setup camera rotation on mouse click
+const cameraPan = new TrackballControls(camera, renderer.domElement)
+
 
 // Setup a GUI with our parameters
 setupControlPanel()
@@ -57,6 +64,7 @@ camera.position.y = 0;
 var genTime = 0
 function animate() {
     requestAnimationFrame(animate);
+    cameraPan.update()
 
     thing.rotation.x += 0.01;
     thing.rotation.y += 0.01;
