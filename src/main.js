@@ -1,10 +1,17 @@
 import * as THREE from 'three'
-import { setupControlPanel } from './ParamsControl'
-import { particleSystems, generateSnowParticles } from './SnowParticles'
-import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
+import { setupControlPanel } from './Config/ParamsControl'
+import { setupLights } from './Objects/Lights';
+import { genBgLights, moveLights } from './Objects/BgLights';
+import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { bloomRender, setupBloomRendering } from './BloomRender';
+import { BG_COLOR } from './Config/Config';
+import Stats from 'three/examples/jsm/libs/stats.module'
 
 // Setup scene
-const scene = new THREE.Scene()
+const scene = new THREE.Scene() 
+
+scene.background = BG_COLOR.BLOOM_OFF
 
 var clock = new THREE.Clock()
 clock.start()
@@ -17,48 +24,45 @@ const camera = new THREE.PerspectiveCamera(
 
 
 // Setup renderer
-const renderer = new THREE.WebGLRenderer();
+export const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
-// Setup camera rotation on mouse click
-const cameraPan = new TrackballControls(camera, renderer.domElement)
+// Setup FPS stats panel
+const stats = new Stats()
+document.body.appendChild(stats.dom)
 
+// Setup camera rotation on mouse click
+const cameraPan = new OrbitControls(camera, renderer.domElement)
 
 // Setup a GUI with our parameters
 setupControlPanel()
 
-// Add a simple object
+// Add a simple object for now...
 const geometry = new THREE.DodecahedronGeometry(1);
 const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
-const thing = new THREE.Mesh( geometry, material );
+const thing = new THREE.Mesh(geometry, material);
 scene.add( thing );
 
-// Add a floor... To be replaced by procedural generation
+// Add a floor... To be replaced by Perlin noise later?
 const floorgeometry = new THREE.BoxGeometry(8, 0.1, 5)
-const floormaterial = new THREE.MeshPhongMaterial({ color: 0x1E792C })
+const floormaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
 const floor = new THREE.Mesh(floorgeometry, floormaterial)
 floor.position.set(0,-1.5,0)
 scene.add(floor)
 
-// Add lights
-const directionalLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
-scene.add(directionalLight);
-
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.9);
-directionalLight2.target = thing
-directionalLight2.position.set(-1,0,0)
-scene.add(directionalLight2)
-
-const pointLight1 = new THREE.PointLight( 0xffffff, 1, 100 );
-pointLight1.position.set( 0,-0.5,1.5 );
-scene.add(pointLight1);
-
-const ambient = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add(ambient);
+// Add some lights!
+setupLights(scene)
 
 camera.position.z = 3;
 camera.position.y = 0;
+
+// Circular lights for background
+genBgLights(scene)
+generateSnowParticles(scene)
+
+// Setup post-processing steps
+setupBloomRendering(scene, camera, renderer)
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 var genTime = 0
@@ -73,16 +77,12 @@ function animate() {
         generateSnowParticles(scene)
         genTime = clock.getElapsedTime()
     }
-    for (const particleSystem of particleSystems) {
-        // Remove particles as they move off screen
-        if (particleSystem.position.y <= -8) {
-            particleSystems.shift(); // logically remove the particles
-            scene.remove(particleSystem); // visually remove the particles 
-            continue
-        }
-        particleSystem.position.y -= 0.01
-    }
+    moveSnowParticles(scene)
+    moveLights(camera, clock)
 
-	renderer.render( scene, camera );
+    // This function call abstracts away post-processing steps
+    bloomRender(scene) 
+
+    stats.update()
 }
 animate();
