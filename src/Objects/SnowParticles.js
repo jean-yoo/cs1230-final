@@ -1,5 +1,4 @@
-// A snow particle implementation
-// ... To be replaced by a more sophisticated one... 
+/* A snow particle implementation */
 import * as THREE from 'three'
 
 let particleSystems = []

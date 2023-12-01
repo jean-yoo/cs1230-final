@@ -58,10 +58,13 @@ function restoreNonBloomObj(obj) {
 }
 
 export function bloomRender(scene) {
+    // Darken all non-bloom objects
     scene.traverse(eraseNonBloomObj)
     scene.background = BG_COLOR.BLOOM_ON
-    bloomComposer.render()
+    bloomComposer.render() // render them
+
+    // restore everything 
     scene.traverse(restoreNonBloomObj)
     scene.background = BG_COLOR.BLOOM_OFF
-    combineComposer.render()
+    combineComposer.render() // render bloom on top of the original
 }

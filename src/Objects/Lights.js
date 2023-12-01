@@ -1,3 +1,4 @@
+/* Add all the light sources in here */
 import * as THREE from 'three'
 
 export function setupLights(scene) {

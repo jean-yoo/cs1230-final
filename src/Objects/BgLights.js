@@ -1,3 +1,5 @@
+/* This file implements the circular moving lights in the background */
+
 import * as THREE from 'three'
 
 const RADIUS = 8

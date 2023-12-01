@@ -10,7 +10,6 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 
 // Setup scene
 const scene = new THREE.Scene() 
-
 scene.background = BG_COLOR.BLOOM_OFF
 
 var clock = new THREE.Clock()
@@ -24,7 +23,7 @@ const camera = new THREE.PerspectiveCamera(
 
 
 // Setup renderer
-export const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(renderer.domElement);
 
@@ -61,7 +60,7 @@ camera.position.y = 0;
 genBgLights(scene)
 generateSnowParticles(scene)
 
-// Setup post-processing steps
+// Setup post-processing steps for selective bloom
 setupBloomRendering(scene, camera, renderer)
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
