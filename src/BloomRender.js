@@ -9,6 +9,9 @@ import { fragmentShader } from './Shaders/frag';
 import { BG_COLOR } from './Config/Config'
 
 const BLOOM_SCENE = 1;
+const BLOOM_STRENGTH = 0.4
+const BLOOM_RADIUS = 0.01
+const BLOOM_THRESHOLD = 0.3
 
 const bloomLayer = new THREE.Layers();
 bloomLayer.set(BLOOM_SCENE);
@@ -22,8 +25,9 @@ export function setupBloomRendering(scene, camera, renderer) {
     const renderPass = new RenderPass(scene, camera)
     const bloomPass = new UnrealBloomPass(
         new THREE.Vector2(window.innverWidth, window.innerHeight),
-        1.0,
-        0.1, 0.3)
+        BLOOM_STRENGTH,
+        BLOOM_RADIUS,
+        BLOOM_THRESHOLD)
     bloomComposer.addPass(renderPass)
     bloomComposer.addPass(bloomPass)
     bloomComposer.renderToScreen = false;
