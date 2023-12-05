@@ -8,6 +8,8 @@ import { bloomRender, setupBloomRendering } from './BloomRender';
 import { BG_COLOR } from './Config/Config';
 import { loadAsset, initializeWFC } from './WaveFunctionCollapse';
 import Stats from 'three/examples/jsm/libs/stats.module'
+import Particle from './Boids/Boids'
+import Fish from './Boids/Fish'
 
 const snowglobe = {
     gui: undefined,
@@ -57,27 +59,41 @@ const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
 // Setup a GUI with our paralocalmeters
 setupControlPanel(snowglobe)
 
-// Add a simple object for now...
-// const geometry = new THREE.DodecahedronGeometry(1);
-// const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
-// const thing = new THREE.Mesh(geometry, material);
-// thing.castShadow = true
-// thing.receiveShadow = true
-// snowglobe.scene.add( thing );
+// add sphere outline 
 var sphereGeometry = new THREE.SphereGeometry(6, 32, 32);
 var sphereMaterial = new THREE.MeshPhongMaterial({
   color: "#fff",
-  opacity: 0.4,
+  opacity: 0.2,
   transparent: true,
   specular: new THREE.Color( 0xffffff ),
-  shininess: 60,
+  shininess: 80,
 //   emissive: new THREE.Color( 0xffffff )
 });
 var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphere.receiveShadow = true
-sphere.castShadow = true
+// sphere.castShadow = true
+console.log(sphere.position);
 snowglobe.scene.add(sphere);
 snowglobe.glass = sphere; 
+var blob, blobs, foid, foids;
+blobs = [];
+foids = [];
+
+for (var i = 0; i < 10; i ++) {
+    // init each particle at a random position and velocity
+    foid = foids[i] = new Particle();
+    foid.position.x = 0; foid.position.y = -1.7; foid.position.z = 0;
+    // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
+    // foid.setBoundaries(8, 8, 8);
+
+    blob = blobs[i] = new THREE.Mesh(
+        new THREE.SphereGeometry(0.3),
+        new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
+    blob.receiveShadow = true
+    blob.castShadow = true
+    // blob.state = Math.ceil(Math.random() * 15);
+    snowglobe.scene.add(blob);
+}
 
 // Add a floor... To be replaced by Perlin noise later?
 // const floorgeometry = new THREE.BoxGeometry(8, 0.1, 5)
@@ -85,6 +101,14 @@ snowglobe.glass = sphere;
 // const floor = new THREE.Mesh(floorgeometry, floormaterial)
 // floor.position.set(0, 0,0)
 // snowglobe.scene.add(floor)
+
+// const geometry = new THREE.DodecahedronGeometry(1);
+// const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
+// const thing = new THREE.Mesh(geometry, material);
+// thing.castShadow = true
+// thing.receiveShadow = true
+// thing.position.set(0,-2,0)
+// snowglobe.scene.add( thing );
 
 loadAsset(snowglobe.scene).then(() => { initializeWFC(snowglobe.scene); ASSETS_LOADED = true; })
 
@@ -110,6 +134,16 @@ function animate() {
         generateSnowParticles(snowglobe.scene)
         genTime = clock.getElapsedTime()
     }
+
+    for (var i = 0, n = blobs.length; i < n; i++) {
+		foid = foids[i];
+		foid.swim(foids);
+		blob = blobs[i]; blob.position.copy(foids[i].position);
+
+		// Update the orientation of the foid
+		// blob.rotation.y = Math.atan2(- foid.velocity.z, foid.velocity.x);
+		// blob.rotation.z = Math.asin(foid.velocity.y / foid.velocity.length());
+    } 
     moveSnowParticles(snowglobe.scene)
     moveLights(camera, clock)
 

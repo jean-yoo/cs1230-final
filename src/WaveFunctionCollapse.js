@@ -33,7 +33,7 @@ function loadAssetHelper(path, objName, offset) {
         .then(gltf => { 
             gltf.scene.traverse((child) => {
                 if (child.isMesh) {
-                  child.castShadow = true;
+                //   child.castShadow = true;
                   child.receiveShadow = true;
                 }
               });

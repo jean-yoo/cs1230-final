@@ -26,14 +26,23 @@ export function setupLights(scene, snowglobe) {
     dirLight.position.set(-1, 1, 3)
     scene.add(dirLight)
 
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.9);
+    dirLight2.layers.enable(0)
+    dirLight2.layers.enable(1)
+    dirLight2.castShadow = true
+    dirLight2.position.set(1, 2, 3)
+    scene.add(dirLight2)
 
 
     const pointLight1 = new THREE.PointLight(0xffffff, 1, 100);
     pointLight1.position.set(0,3,0);
     scene.add(pointLight1);
 
-    const ambient = new THREE.AmbientLight(0x404040, 1); // soft white light
-    scene.add(ambient)
+    // const ambient = new THREE.AmbientLight(0x404040, 1); // soft white light
+    // scene.add(ambient)
+
+    const ambient2 = new THREE.AmbientLight(0.9); // soft white light
+    scene.add(ambient2)
 }
 let prevTimeOfDay = 0
 export function updateLighting(snowglobe) {
