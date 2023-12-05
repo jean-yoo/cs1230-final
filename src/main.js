@@ -9,7 +9,7 @@ import { BG_COLOR } from './Config/Config';
 import { loadAsset, initializeWFC } from './WaveFunctionCollapse';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
-import Fish from './Boids/Fish'
+
 
 const snowglobe = {
     gui: undefined,
