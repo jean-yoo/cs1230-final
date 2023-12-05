@@ -30,7 +30,14 @@ let OBJ_DICT = {}
 // the 'offset' parameter is used to account for the blender transforms
 function loadAssetHelper(path, objName, offset) {
     return loader.loadAsync(path)
-        .then(gltf => { return gltf.scene })
+        .then(gltf => { 
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
+            return gltf.scene})
         .then(object => {
             // object.scale.set(GRID_SIZE,GRID_SIZE,GRID_SIZE)
             OBJ_DICT[objName] = { obj: object, type:BLOCKTYPE[objName] }
