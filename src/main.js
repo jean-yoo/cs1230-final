@@ -23,6 +23,7 @@ const snowglobe = {
     // orbitControls: undefined,
     params: undefined,
     // stats: undefined, // Temporary
+    glass: undefined
   }
   
 
@@ -57,12 +58,26 @@ const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
 setupControlPanel(snowglobe)
 
 // Add a simple object for now...
-const geometry = new THREE.DodecahedronGeometry(1);
-const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
-const thing = new THREE.Mesh(geometry, material);
-thing.castShadow = true
-thing.receiveShadow = true
-snowglobe.scene.add( thing );
+// const geometry = new THREE.DodecahedronGeometry(1);
+// const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
+// const thing = new THREE.Mesh(geometry, material);
+// thing.castShadow = true
+// thing.receiveShadow = true
+// snowglobe.scene.add( thing );
+var sphereGeometry = new THREE.SphereGeometry(6, 32, 32);
+var sphereMaterial = new THREE.MeshPhongMaterial({
+  color: "#fff",
+  opacity: 0.4,
+  transparent: true,
+  specular: new THREE.Color( 0xffffff ),
+  shininess: 60,
+//   emissive: new THREE.Color( 0xffffff )
+});
+var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+sphere.receiveShadow = true
+sphere.castShadow = true
+snowglobe.scene.add(sphere);
+snowglobe.glass = sphere; 
 
 // Add a floor... To be replaced by Perlin noise later?
 // const floorgeometry = new THREE.BoxGeometry(8, 0.1, 5)

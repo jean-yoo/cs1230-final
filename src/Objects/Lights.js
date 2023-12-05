@@ -19,7 +19,7 @@ export function setupLights(scene, snowglobe) {
     snowglobe.renderer.shadowMap.enabled = true
     snowglobe.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
-    dirLight = new THREE.DirectionalLight(0xffffff, snowglobe.params.dirLightIntensity);
+    dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.layers.enable(0)
     dirLight.layers.enable(1)
     dirLight.castShadow = true
@@ -65,5 +65,15 @@ function updateTimeOfDay(snowglobe) {
     1.25
   )
   dirLight.intensity = snowglobe.params.dirLightIntensity
+  const color1 = new THREE.Color(); 
+
+  // snowglobe.glass.material.color.set(color1.lerpColors((nightColor, dayColor, dayness)))
+  // snowglobe.glass.material.color.set(color1.lerp(duskColor, duskness))
+
+  snowglobe.scene.background.set(color1.lerpColors(nightColor, dayColor, dayness))
+  snowglobe.scene.background.set(color1.lerp(duskColor, duskness))
+
+  // console.log(snowglobe.scene.background)
+
 
 }
