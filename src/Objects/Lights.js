@@ -19,30 +19,47 @@ export function setupLights(scene, snowglobe) {
     snowglobe.renderer.shadowMap.enabled = true
     snowglobe.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
+
     dirLight = new THREE.DirectionalLight(0xffffff, 1);
     dirLight.layers.enable(0)
     dirLight.layers.enable(1)
     dirLight.castShadow = true
-    dirLight.position.set(-1, 1, 3)
+    // dirLight.color.setHSL( 0.1, 1, 0.95 );
+    // dirLight.position.set( - 1, 1.75, 1 );
+    // dirLight.position.multiplyScalar( 30 );
+    // dirLight.shadow.mapSize.width = 2048;
+    // dirLight.shadow.mapSize.height = 2048;
+    // const d = 50;
+
+    // dirLight.shadow.camera.left = - d;
+    // dirLight.shadow.camera.right = d;
+    // dirLight.shadow.camera.top = d;
+    // dirLight.shadow.camera.bottom = - d;
+
+    // dirLight.shadow.camera.far = 3500;
+    // dirLight.shadow.bias = - 0.0001;
+    
     scene.add(dirLight)
 
-    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.9);
-    dirLight2.layers.enable(0)
-    dirLight2.layers.enable(1)
-    dirLight2.castShadow = true
-    dirLight2.position.set(1, 2, 3)
-    scene.add(dirLight2)
 
+    const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
+    hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    hemiLight.position.set( 0, 50, 0 );
+    scene.add( hemiLight );
+
+    
 
     const pointLight1 = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight1.position.set(0,3,0);
+    pointLight1.position.set(0,1,0);
     scene.add(pointLight1);
 
-    // const ambient = new THREE.AmbientLight(0x404040, 1); // soft white light
-    // scene.add(ambient)
+    // const pointLight2 = new THREE.PointLight(0xffffff, 1, 100);
+    // pointLight2.position.set(0,-3,0);
+    // scene.add(pointLight2);
 
-    const ambient2 = new THREE.AmbientLight(0.9); // soft white light
-    scene.add(ambient2)
+    const ambient = new THREE.AmbientLight(0x404040, 0.5); // soft white light
+    scene.add(ambient)
 }
 let prevTimeOfDay = 0
 export function updateLighting(snowglobe) {

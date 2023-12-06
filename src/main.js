@@ -46,6 +46,7 @@ camera.position.set(0,1,5)
 
 // Setup renderer
 snowglobe.renderer = new THREE.WebGLRenderer();
+snowglobe.renderer.localClippingEnabled = true;
 snowglobe.renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(snowglobe.renderer.domElement);
 
@@ -94,23 +95,34 @@ for (var i = 0; i < 10; i ++) {
     // blob.state = Math.ceil(Math.random() * 15);
     snowglobe.scene.add(blob);
 }
+// Add a floor..
+const clipPlanes = [
+  new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), -2 ),
+];
+const geometry = new THREE.SphereGeometry( 5.7, 32, 32 );
 
-// Add a floor... To be replaced by Perlin noise later?
-// const floorgeometry = new THREE.BoxGeometry(8, 0.1, 5)
-// const floormaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
-// const floor = new THREE.Mesh(floorgeometry, floormaterial)
-// floor.position.set(0, 0,0)
-// snowglobe.scene.add(floor)
+const material = new THREE.MeshLambertMaterial( {
 
-// const geometry = new THREE.DodecahedronGeometry(1);
-// const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
-// const thing = new THREE.Mesh(geometry, material);
-// thing.castShadow = true
-// thing.receiveShadow = true
-// thing.position.set(0,-2,0)
-// snowglobe.scene.add( thing );
+  color: 0xfffffff,
+  side: THREE.DoubleSide,
+  clippingPlanes: clipPlanes,
+  clipIntersection: false
+} );
 
-loadAsset(snowglobe.scene).then(() => { initializeWFC(snowglobe.scene); ASSETS_LOADED = true; })
+const circleGeometry = new THREE.CircleGeometry( 5.35, 32 ); 
+circleGeometry.rotateX(-Math.PI * 0.5) 
+var circleMaterial = new THREE.MeshLambertMaterial( { color: "rgb(230, 225, 223)"} ); 
+var groundCap = new THREE.Mesh( circleGeometry, circleMaterial );
+groundCap.receiveShadow = true;
+groundCap.position.set(0,-2.0,0)
+var groundSide = new THREE.Mesh( geometry, material );
+groundSide.receiveShadow = true;
+groundSide.add(groundCap)
+snowglobe.scene.add(groundSide); 
+
+
+loadAsset(snowglobe.scene).then(
+  () => { ASSETS_LOADED = true; })
 
 // Add some lights!
 setupLights(snowglobe.scene, snowglobe)
