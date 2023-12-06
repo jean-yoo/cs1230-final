@@ -180,6 +180,7 @@ function animate() {
     if (!ASSETS_LOADED) return 
     if (!propsGenerated) {
         spawnProps(snowglobe); 
+        spawnBoids()
         propsGenerated = true;
     }
     cameraPan.update()
