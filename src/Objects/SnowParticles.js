@@ -5,10 +5,10 @@ let particleSystems = []
 
 export function generateSnowParticles(scene) {
     const vertices = [];
-    for (let i = 0; i < 15; i++) {
-        const x = THREE.MathUtils.randFloatSpread(5);
-        const y = THREE.MathUtils.randFloatSpread(3) + 4;
-        const z = THREE.MathUtils.randFloatSpread(5);
+    for (let i = 0; i < 25; i++) {
+        const x = THREE.MathUtils.randFloatSpread(7);
+        const y = THREE.MathUtils.randFloatSpread(2) + 4;
+        const z = THREE.MathUtils.randFloatSpread(7);
         vertices.push(x, y, z);
     }
     const particles = new THREE.BufferGeometry();

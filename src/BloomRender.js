@@ -9,13 +9,14 @@ import { fragmentShader } from './Shaders/frag';
 import { BG_COLOR } from './Config/Config'
 
 const BLOOM_SCENE = 1;
-const BLOOM_STRENGTH = 0.5
+const BLOOM_STRENGTH = 0.6
 const BLOOM_RADIUS = 0.4
 const BLOOM_THRESHOLD = 0.0
 
 const bloomLayer = new THREE.Layers();
 bloomLayer.set(BLOOM_SCENE);
-const DARK_MATERIAL = new THREE.MeshBasicMaterial( { color: 'black' } );
+const DARK_MATERIAL = new THREE.MeshBasicMaterial({ color: 'black' });
+const TRANSPARENT_MATERIAL = new THREE.MeshBasicMaterial({transparent:true, opacity:0})
 let materials = {}
 
 let bloomComposer;
@@ -62,6 +63,7 @@ function restoreNonBloomObj(obj) {
 }
 
 export function bloomRender(scene) {
+
     // Darken all non-bloom objects
     scene.traverse(eraseNonBloomObj)
     scene.background = BG_COLOR.BLOOM_ON

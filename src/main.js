@@ -1,18 +1,38 @@
 import * as THREE from 'three'
-import { setupControlPanel } from './Config/ParamsControl'
-import { setupLights } from './Objects/Lights';
+import { setupControlPanel, updateParams } from './Config/ParamsControl'
+import { setupLights, updateLighting } from './Objects/Lights';
 import { genBgLights, moveLights } from './Objects/BgLights';
 import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { bloomRender, setupBloomRendering } from './BloomRender';
 import { BG_COLOR } from './Config/Config';
-import { loadAsset, initializeWFC, loadWFCAsset, initializePMF } from './WaveFunctionCollapse';
+import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
+import Particle from './Boids/Boids'
+
+
+const snowglobe = {
+    gui: undefined,
+    // container: document.getElementById('container'),
+    // canvas: document.getElementById('cityscape'),
+    // screenResolution: undefined,
+    // camera: undefined,
+    scene: undefined,
+    renderer: undefined,
+    // cloudComposer: undefined,
+    // bloomComposer: undefined,
+    // shaderComposer: undefined,
+    // orbitControls: undefined,
+    params: undefined,
+    // stats: undefined, // Temporary
+    glass: undefined
+  }
+  
 
 let ASSETS_LOADED = false
 // Setup scene
-const scene = new THREE.Scene() 
-scene.background = BG_COLOR.BLOOM_OFF
+snowglobe.scene = new THREE.Scene() 
+snowglobe.scene.background = BG_COLOR.BLOOM_OFF
 
 var clock = new THREE.Clock()
 clock.start()
@@ -25,69 +45,129 @@ let camera = new THREE.PerspectiveCamera(
 camera.position.set(0,1,5)
 
 // Setup renderer
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild(renderer.domElement);
+snowglobe.renderer = new THREE.WebGLRenderer();
+snowglobe.renderer.localClippingEnabled = true;
+snowglobe.renderer.setSize( window.innerWidth, window.innerHeight );
+document.body.appendChild(snowglobe.renderer.domElement);
 
 // Setup FPS stats panel
 const stats = new Stats()
 document.body.appendChild(stats.dom)
 
 // Setup camera rotation on mouse click
-const cameraPan = new OrbitControls(camera, renderer.domElement)
+const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
 
 // Setup a GUI with our paralocalmeters
-setupControlPanel()
+setupControlPanel(snowglobe)
 
-// Add a simple object for now...
-// const geometry = new THREE.DodecahedronGeometry(1);
-// const material = new THREE.MeshPhongMaterial( { color: 0xC54245 } );
-// const thing = new THREE.Mesh(geometry, material);
-// scene.add( thing );
+// add sphere outline 
+var sphereGeometry = new THREE.SphereGeometry(6, 32, 32);
+var sphereMaterial = new THREE.MeshPhongMaterial({
+  color: "#fff",
+  opacity: 0.2,
+  transparent: true,
+  specular: new THREE.Color( 0xffffff ),
+  shininess: 90,
+//   emissive: new THREE.Color( 0xffffff )
+});
+var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+sphere.name = "SNOW_SPHERE"
+sphere.layers.toggle(1)
+console.log(sphere)
+sphere.receiveShadow = false
+// sphere.castShadow = true
+snowglobe.scene.add(sphere);
+snowglobe.glass = sphere; 
+var blob, blobs, foid, foids;
+blobs = [];
+foids = [];
 
-// Add a floor... To be replaced by Perlin noise later?
-// const floorgeometry = new THREE.BoxGeometry(8, 0.1, 5)
-// const floormaterial = new THREE.MeshPhongMaterial({ color: 0xffffff })
-// const floor = new THREE.Mesh(floorgeometry, floormaterial)
-// floor.position.set(0, 0,0)
-// scene.add(floor)
+// for (var i = 0; i < 3; i ++) {
+//     // init each particle at a random position and velocity
+//     foid = foids[i] = new Particle();
+//     // foid.position = new THREE.Vector3(1,1,1);
+//     // console.log(foid.position)
+//     // console.log(foid)
+//     foid.position.x = 1.0; foid.position.y = -1.7; foid.position.z = 1.0*Math.random();
+//     // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
+//     // foid.setBoundaries(8, 8, 8);
 
-loadAsset(scene)
-    .then(() => loadWFCAsset())
-    .then(NUM_WFC_BLOCKS => {
-        console.log("NUM WFC BLOCKS:", NUM_WFC_BLOCKS); 
-        initializeWFC(scene); 
-        ASSETS_LOADED = true;
-    })
-    .then(() => initializePMF())
+//     blob = blobs[i] = new THREE.Mesh(
+//         new THREE.SphereGeometry(1),
+//         new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
+//     blob.receiveShadow = true
+//     blob.castShadow = true
+//     // blob.state = Math.ceil(Math.random() * 15);
+//     snowglobe.scene.add(blob);
+// }
+// Add a floor..
+const clipPlanes = [
+  new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), -2 ),
+];
+const geometry = new THREE.SphereGeometry( 5.7, 32, 32 );
+
+const material = new THREE.MeshLambertMaterial( {
+  color: 0xfffffff,
+  side: THREE.DoubleSide,
+  clippingPlanes: clipPlanes,
+  clipIntersection: false
+} );
+
+const circleGeometry = new THREE.CircleGeometry( 5.35, 32 ); 
+circleGeometry.rotateX(-Math.PI * 0.5) 
+var circleMaterial = new THREE.MeshLambertMaterial({ color: "rgb(230, 225, 223)" });
+
+var groundCap = new THREE.Mesh( circleGeometry, circleMaterial );
+groundCap.receiveShadow = true;
+groundCap.position.set(0, -2.0, 0)
+
+var groundSide = new THREE.Mesh( geometry, material );
+groundSide.receiveShadow = true;
+groundSide.add(groundCap)
+snowglobe.scene.add(groundSide); 
+
+
+loadAsset().then(() => { ASSETS_LOADED = true; })
 
 // Add some lights!
-setupLights(scene)
+setupLights(snowglobe.scene, snowglobe)
 
 // Circular lights for background
-genBgLights(scene)
-generateSnowParticles(scene)
+genBgLights(snowglobe.scene)
+generateSnowParticles(snowglobe.scene)
 
 // Setup post-processing steps for selective bloom
-setupBloomRendering(scene, camera, renderer)
-
+setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
 // Rendering Loop: This is the "paintGL" equivalent in three.js
+let propsGenerated = false
 var genTime = 0
 function animate() {
     requestAnimationFrame(animate);
-    if (!ASSETS_LOADED) return;
-
+    if (!ASSETS_LOADED) return 
+    if (!propsGenerated) {
+        spawnProps(snowglobe.scene); propsGenerated = true;
+    }
     cameraPan.update()
 
     if (clock.getElapsedTime() - genTime > 2) {
-        generateSnowParticles(scene)
+        generateSnowParticles(snowglobe.scene)
         genTime = clock.getElapsedTime()
     }
-    moveSnowParticles(scene)
+    // for (var i = 0, n = blobs.length; i < n; i++) {
+	// 	foid = foids[i];
+	// 	foid.swim(foids);
+	// 	blob = blobs[i]; blob.position.copy(foids[i].position);
+
+	// 	// Update the orientation of the foid
+	// 	// blob.rotation.y = Math.atan2(- foid.velocity.z, foid.velocity.x);
+	// 	// blob.rotation.z = Math.asin(foid.velocity.y / foid.velocity.length());
+    // } 
+    moveSnowParticles(snowglobe.scene)
     moveLights(camera, clock)
 
     // This function call abstracts away post-processing steps
-    bloomRender(scene) 
+    bloomRender(snowglobe.scene)
+    updateLighting(snowglobe)
 
     stats.update()
 }
