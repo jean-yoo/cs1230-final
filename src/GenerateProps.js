@@ -49,7 +49,14 @@ function translate(obj, dx, dy, dz) {
 let OBJ_DICT = {}
 function loadAssetHelper(path, objName) {
     return loader.loadAsync(path)
-        .then(gltf => { return gltf.scene })
+    .then(gltf => { 
+        gltf.scene.traverse((child) => {
+            if (child.isMesh) {
+              child.castShadow = true;
+              child.receiveShadow = true;
+            }
+          });
+        return gltf.scene})
         .then(object => {
             object.scale.set(GRID_SIZE, GRID_SIZE, GRID_SIZE)
             OBJ_DICT[objName] = { obj: object, type: BLOCKTYPE[objName], name:objName }
