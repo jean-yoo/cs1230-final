@@ -67,7 +67,7 @@ var sphereMaterial = new THREE.MeshPhongMaterial({
   opacity: 0.2,
   transparent: true,
   specular: new THREE.Color( 0xffffff ),
-  shininess: 80,
+  shininess: 90,
 //   emissive: new THREE.Color( 0xffffff )
 });
 var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -80,15 +80,18 @@ var blob, blobs, foid, foids;
 blobs = [];
 foids = [];
 
-for (var i = 0; i < 10; i ++) {
+for (var i = 0; i < 3; i ++) {
     // init each particle at a random position and velocity
     foid = foids[i] = new Particle();
-    foid.position.x = 0; foid.position.y = -1.7; foid.position.z = 0;
+    // foid.position = new THREE.Vector3(1,1,1);
+    // console.log(foid.position)
+    // console.log(foid)
+    foid.position.x = 1.0; foid.position.y = -1.7; foid.position.z = 1.0*Math.random();
     // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
     // foid.setBoundaries(8, 8, 8);
 
     blob = blobs[i] = new THREE.Mesh(
-        new THREE.SphereGeometry(0.3),
+        new THREE.SphereGeometry(1),
         new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
     blob.receiveShadow = true
     blob.castShadow = true
@@ -146,7 +149,6 @@ function animate() {
         generateSnowParticles(snowglobe.scene)
         genTime = clock.getElapsedTime()
     }
-
     for (var i = 0, n = blobs.length; i < n; i++) {
 		foid = foids[i];
 		foid.swim(foids);

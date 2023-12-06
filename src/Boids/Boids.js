@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 export default class Particle {
     constructor() {
-	this.position = new THREE.Vector3();
+	this.position = new THREE.Vector3(0,0,0);
 	this.velocity = new THREE.Vector3().randomDirection();
     this.velocity.multiplyScalar(0.01);
 	var _acceleration = new THREE.Vector3();
 
 	var _depth, _height, _width, _goal, _padding = 5, _speed = 0.1,
-		_maneuver = 0.2;
+		_maneuver = 10;
 
 	this.setBoundaries = function (width, height, depth) {
 		_width = width;
@@ -16,6 +16,7 @@ export default class Particle {
 	};
 
 	this.swim = function (particles) {
+		// console.log("lsdfjas", this.position.z)
 		// prevent boundary collisions
 		// var vector = new THREE.Vector3();
 		// vector.set(- _width, this.position.y, this.position.z);
@@ -55,7 +56,8 @@ export default class Particle {
 		// _acceleration.add(vector);
 
 		// // if (Math.random() > 0.5) {
-		// 	this.flock(particles);
+		this.flock(particles);
+		// this.velocity.add(_acceleration);
         // // }
         // var vector = new THREE.Vector3();
         // // console.log("boids")
@@ -63,9 +65,15 @@ export default class Particle {
         this.checkEdge(this.velocity);
         // console.log(this.velocity)
         this.velocity.setComponent(1, 0); 
+		if (this.velocity.length() > 0.01) {
+			this.velocity.normalize();
+			this.velocity.multiplyScalar(0.01);
+		  }
+		//   console.log(this.velocity);
         // vector.multiplyScalar(0.5);
         // this.position.lerp(vector, 0.1);
         this.position.add(this.velocity);
+		_acceleration.set(0, 0, 0);
         // _acceleration.add(vector);
 
 		// this.move();
@@ -94,14 +102,15 @@ export default class Particle {
         // return vector 
     }
 
-	// this.flock = function (particles) {
-	// 	if (_goal)
-	// 		_acceleration.add(this.reach(_goal, 0.0002));
+	this.flock = function (particles) {
+		this.velocity.add(this.separation(particles)); 
+		// if (_goal)
+		// 	_acceleration.add(this.reach(_goal, 0.0002));
 
-	// 	_acceleration.add(this.alignment(particles));
-	// 	_acceleration.add(this.cohesion(particles));
-	// 	_acceleration.add(this.separation(particles));
-	// };
+		// _acceleration.add(this.alignment(particles));
+		// _acceleration.add(this.cohesion(particles));
+		// _acceleration.add(this.separation(particles));
+	};
 
 	// this.move = function () {
 	// 	this.velocity.add(_acceleration);
@@ -146,85 +155,93 @@ export default class Particle {
 	// 	return steer;
 	// };
 
-	// this.alignment = function (particles) {
-	// 	var particle, total = new THREE.Vector3(),
-	// 	count = 0;
+	this.alignment = function (particles) {
+		var particle, total = new THREE.Vector3(0,0,0),
+		count = 0;
 
-	// 	for (var i = 0, n = particles.length; i < n; i++) {
-	// 		if (Math.random() > 0.6)
-	// 			continue;
+		for (var i = 0, n = particles.length; i < n; i++) {
+			// if (Math.random() > 0.6)
+			// 	continue;
 
-	// 		particle = particles[i];
-	// 		var distance = particle.position.distanceTo(this.position);
+			particle = particles[i];
+			var distance = particle.position.distanceTo(this.position);
+			total.add(particle.velocity.normalize());
+		}
+		total.normalize();
+		total.multiplyScalar(0.00001); 
+		return total; 
 
-	// 		if (distance > 0 && distance <= _padding) {
-	// 			total.add(particle.velocity);
-	// 			count++;
-	// 		}
-	// 	}
+		// 	if (distance > 0 && distance <= _padding) {
+		// 		total.add(particle.velocity);
+		// 		count++;
+		// 	}
+		// }
 
-	// 	if (count > 0) {
-	// 		total.divideScalar(count);
+		// if (count > 0) {f
+		// 	total.divideScalar(count);
 
-	// 		if (total.length() > _maneuver)
-	// 			total.divideScalar(total.length() / _maneuver);
-	// 	}
+		// 	if (total.length() > _maneuver)
+		// 		total.divideScalar(total.length() / _maneuver);
+		// }
 
-	// 	return total;
-	// };
+		return total;
+	};
 
-	// this.cohesion = function (particles) {
-	// 	var particle, distance,
-	// 	sum = new THREE.Vector3(),
-	// 	steer = new THREE.Vector3(),
-	// 	count = 0;
+	this.cohesion = function (particles) {
+		var particle, distance,
+		sum = new THREE.Vector3(),
+		steer = new THREE.Vector3(),
+		count = 0;
 
-	// 	for (var i = 0, n = particles.length; i < n; i ++) {
+		for (var i = 0, n = particles.length; i < n; i ++) {
 
-	// 		if (Math.random() > 0.6)
-	// 			continue;
+			if (Math.random() > 0.6)
+				continue;
 
-	// 		particle = particles[i];
-	// 		distance = particle.position.distanceTo(this.position);
+			particle = particles[i];
+			distance = particle.position.distanceTo(this.position);
 
-	// 		if (distance > 0 && distance <= _padding) {
-	// 			sum.add(particle.position);
-	// 			count++;
-	// 		}
-	// 	}
+			if (distance > 0 && distance <= _padding) {
+				sum.add(particle.position);
+				count++;
+			}
+		}
 
-	// 	if (count > 0)
-	// 		sum.divideScalar(count);
+		if (count > 0)
+			sum.divideScalar(count);
 
-	// 	steer.subVectors(sum, this.position);
+		steer.subVectors(sum, this.position);
 
-	// 	if (steer.length() > _maneuver)
-	// 		steer.divideScalar(steer.length() / _maneuver);
+		if (steer.length() > _maneuver)
+			steer.divideScalar(steer.length() / _maneuver);
 
-	// 	return steer;
-	// };
+		return steer;
+	};
 
-	// this.separation = function (particles) {
-	// 	var particle, distance,
-	// 	sum = new THREE.Vector3(),
-	// 	repulse = new THREE.Vector3();
+	this.separation = function (particles) {
+		var particle, distance,
+		sum = new THREE.Vector3(),
+		repulse = new THREE.Vector3();
 
-	// 	for (var i = 0, n = particles.length; i < n; i ++) {
-	// 		if (Math.random() > 0.6)
-	// 			continue;
+		for (var i = 0, n = particles.length; i < n; i ++) {
+			// if (Math.random() > 0.6)
+			// 	continue;
 
-	// 		particle = particles[i];
-	// 		distance = particle.position.distanceTo(this.position);
+			particle = particles[i];
+			distance = particle.position.distanceTo(this.position);
+			// console.log(this.position)
 
-	// 		if (distance > 0 && distance <= _padding) {
-	// 			repulse.subVectors(this.position, particle.position);
-	// 			repulse.normalize();
-	// 			repulse.divideScalar(distance);
-    //             repulse.setComponent(1, 0); 
-	// 			sum.add(repulse);
-	// 		}
-	// 	}
-
-	// 	return sum;
-	// };
+			// if (distance > 0 && distance <= _padding) {
+				if (distance > 0) {
+					repulse.subVectors(this.position, particle.position);
+					repulse.normalize();
+					repulse.divideScalar(distance);
+					// repulse.setComponent(1, 0); 
+					sum.add(repulse);
+				}
+			// }
+		}
+		return sum;
+		
+	};
 }};
