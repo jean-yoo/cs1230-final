@@ -67,7 +67,7 @@ var sphereMaterial = new THREE.MeshPhongMaterial({
   opacity: 0.2,
   transparent: true,
   specular: new THREE.Color( 0xffffff ),
-  shininess: 90,
+  shininess: 100,
 //   emissive: new THREE.Color( 0xffffff )
 });
 var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
@@ -82,24 +82,31 @@ var blob, blobs, foid, foids;
 blobs = [];
 foids = [];
 
-// for (var i = 0; i < 3; i ++) {
-//     // init each particle at a random position and velocity
-//     foid = foids[i] = new Particle();
-//     // foid.position = new THREE.Vector3(1,1,1);
-//     // console.log(foid.position)
-//     // console.log(foid)
-//     foid.position.x = 1.0; foid.position.y = -1.7; foid.position.z = 1.0*Math.random();
-//     // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
-//     // foid.setBoundaries(8, 8, 8);
+for (var i = 0; i < 12; i ++) {
+    // init each particle at a random position and velocity
+    foid = foids[i] = new Particle();
+    // foid.position = new THREE.Vector3(1,1,1);
+    // console.log(foid.position)
+    // console.log(foid)
+    if (i >= 0 && i < 4) {
+    foid.position.x = THREE.MathUtils.randFloat(-5,-1.0); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
+    } else if (( i >= 4) && (i < 8)) {
+      foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(2.0,4.5);
+    } else {
+      foid.position.x = THREE.MathUtils.randFloat(-1, 0.9); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(1.0,1.2);
+    }
+    // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
+    // foid.setBoundaries(8, 8, 8);
 
-//     blob = blobs[i] = new THREE.Mesh(
-//         new THREE.SphereGeometry(1),
-//         new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
-//     blob.receiveShadow = true
-//     blob.castShadow = true
-//     // blob.state = Math.ceil(Math.random() * 15);
-//     snowglobe.scene.add(blob);
-// }
+    blob = blobs[i] = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(0.3),
+        new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
+    blob.receiveShadow = true
+    blob.castShadow = true
+    blob.position.copy(foids[i].position)
+    // blob.state = Math.ceil(Math.random() * 15);
+    snowglobe.scene.add(blob);
+}
 // Add a floor..
 const clipPlanes = [
   new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), -2 ),
@@ -138,6 +145,7 @@ generateSnowParticles(snowglobe.scene)
 
 // Setup post-processing steps for selective bloom
 setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
+console.log(foids)
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
@@ -153,15 +161,15 @@ function animate() {
         generateSnowParticles(snowglobe.scene)
         genTime = clock.getElapsedTime()
     }
-    // for (var i = 0, n = blobs.length; i < n; i++) {
-	// 	foid = foids[i];
-	// 	foid.swim(foids);
-	// 	blob = blobs[i]; blob.position.copy(foids[i].position);
+    for (var i = 0, n = blobs.length; i < n; i++) {
+		foid = foids[i];
+		foid.swim(foids);
+		blob = blobs[i]; blob.position.copy(foids[i].position);
 
-	// 	// Update the orientation of the foid
-	// 	// blob.rotation.y = Math.atan2(- foid.velocity.z, foid.velocity.x);
-	// 	// blob.rotation.z = Math.asin(foid.velocity.y / foid.velocity.length());
-    // } 
+		// Update the orientation of the foid
+		blob.rotation.y = 0.06*Math.atan2(- foid.velocity.z, foid.velocity.x);
+		blob.rotation.z = 0.06*Math.asin(foid.velocity.y / foid.velocity.length());
+    } 
     moveSnowParticles(snowglobe.scene)
     moveLights(camera, clock)
 
