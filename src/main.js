@@ -4,7 +4,7 @@ import { setupLights, updateLighting } from './Objects/Lights';
 import { genBgLights, moveLights } from './Objects/BgLights';
 import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { bloomRender, setupBloomRendering } from './BloomRender';
+import { bloomRender, setupBloomRendering, BLOOM_LAYER} from './BloomRender';
 import { BG_COLOR } from './Config/Config';
 import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
@@ -25,9 +25,18 @@ const snowglobe = {
     // orbitControls: undefined,
     params: undefined,
     // stats: undefined, // Temporary
-    glass: undefined
+    glass: undefined,
+    glowObjs: [] // Used to control blooming/lighting based on time of day
   }
   
+function enableGlow(obj) {
+  if (obj.isMesh && !BLOOM_LAYER.test(obj.layers)) obj.layers.toggle(1)
+  else if(obj.isPointLight) obj.intensity = 1
+}
+function disableGlow(obj) {
+  if (obj.isMesh && BLOOM_LAYER.test(obj.layers)) obj.layers.toggle(1)
+  else if(obj.isPointLight) obj.intensity = 0
+}
 
 let ASSETS_LOADED = false
 // Setup scene
@@ -45,7 +54,7 @@ let camera = new THREE.PerspectiveCamera(
 camera.position.set(0,1,5)
 
 // Setup renderer
-snowglobe.renderer = new THREE.WebGLRenderer();
+snowglobe.renderer = new THREE.WebGLRenderer({antialias: true});
 snowglobe.renderer.localClippingEnabled = true;
 snowglobe.renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild(snowglobe.renderer.domElement);
@@ -70,14 +79,13 @@ var sphereMaterial = new THREE.MeshPhongMaterial({
   shininess: 100,
 //   emissive: new THREE.Color( 0xffffff )
 });
-var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-sphere.name = "SNOW_SPHERE"
-// sphere.layers.toggle(1)
-console.log(sphere)
-sphere.receiveShadow = false
+var globeGlass = new THREE.Mesh(sphereGeometry, sphereMaterial);
+globeGlass.name = "SNOW_SPHERE"
+globeGlass.receiveShadow = false
+snowglobe.glowObjs.push(globeGlass)
 // sphere.castShadow = true
-snowglobe.scene.add(sphere);
-snowglobe.glass = sphere; 
+snowglobe.scene.add(globeGlass);
+snowglobe.glass = globeGlass; 
 var blob, blobs, foid, foids;
 blobs = [];
 foids = [];
@@ -151,11 +159,16 @@ console.log(foids)
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
+
+const GLOBE_BLOOM = { off:0, on:1} 
+let globeBloom = GLOBE_BLOOM.off
+const isNight = () => snowglobe.params.timeOfDay<8.5 || snowglobe.params.timeOfDay>18.5
 function animate() {
     requestAnimationFrame(animate);
     if (!ASSETS_LOADED) return 
     if (!propsGenerated) {
-        spawnProps(snowglobe.scene); propsGenerated = true;
+        spawnProps(snowglobe); 
+        propsGenerated = true;
     }
     cameraPan.update()
 
@@ -167,7 +180,14 @@ function animate() {
 		foid = foids[i];
 		foid.swim(foids);
 		blob = blobs[i]; blob.position.copy(foids[i].position);
-
+    
+    if (isNight() && globeBloom==GLOBE_BLOOM.off) {
+      for (const obj of snowglobe.glowObjs) { enableGlow(obj) }
+      globeBloom = GLOBE_BLOOM.on
+    } else if (!isNight() && globeBloom == GLOBE_BLOOM.on) {
+      for (const obj of snowglobe.glowObjs) { disableGlow(obj) }
+      globeBloom = GLOBE_BLOOM.off
+    }
 		// Update the orientation of the foid
 		blob.rotation.y = 0.06*Math.atan2(- foid.velocity.z, foid.velocity.x);
 		blob.rotation.z = 0.06*Math.asin(foid.velocity.y / foid.velocity.length());

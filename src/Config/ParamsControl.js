@@ -24,6 +24,7 @@ export function setupControlPanel(snowglobe) {
 
     snowglobe.params = parameters
     snowglobe.gui = gui
+    console.log(gui)
 }
 export function updateParams(params) {
     parameters = params;

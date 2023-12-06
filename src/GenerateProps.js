@@ -2,12 +2,12 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 const loader = new GLTFLoader()
-var radius = 10 // number of blocks for the FLOOR
+var radius = 5 // number of blocks for the FLOOR
 var height = 4 // number of blocks for anything above the floor
 var sideLen = 2 * radius + 1
 var grid = new Array(Math.pow(2 * radius + 1, 2) * height) // corresponding to x, y, and z
 for (let i = 0; i < grid.length; i++) grid[i] = -1;
-const GRID_SIZE = 0.4
+const GRID_SIZE = 0.8
 
 const BLOCKTYPE = {
     NONE: -1,
@@ -105,12 +105,12 @@ export async function loadAsset() {
 
     for (const child of OBJ_DICT["CHURCH"].obj.children) {
         if (child.name.includes("Snow")) child.material = snowToonMaterial
-        else if (child.name.includes("Window")) child.layers.toggle(1)
+        // else if (child.name.includes("Window")) child.layers.toggle(1)
     }
 
     for (const child of OBJ_DICT["HOUSE_SMALL"].obj.children) {
         if (child.name.includes("Snow")) child.material = snowToonMaterial
-        else if (child.name.includes("Window")) child.layers.toggle(1)
+        // else if (child.name.includes("Window")) child.layers.toggle(1)
     }
     for (const child of OBJ_DICT["SNOWMAN_DERPY"].obj.children) {
         if (child.name.includes("Snow")) {
@@ -120,7 +120,7 @@ export async function loadAsset() {
         }
     }
 
-    OBJ_DICT["LAMP"].obj.children[2].layers.toggle(1)
+    // OBJ_DICT["LAMP"].obj.children[2].layers.toggle(1)
     for (const child of OBJ_DICT["LAMP"].obj.children) {
         if (child.name.includes("light")) child.material = new THREE.MeshToonMaterial({ color: 0xfffff0, gradientMap: threeTone })
         else child.material = new THREE.MeshToonMaterial({ color: 0x000000, gradientMap: threeTone })
@@ -147,13 +147,13 @@ function checkCollision(pos, br) {
         if (r2 < minDist*minDist) return true
     }
 
-    return false
+    return false 
 }
 
 let churchSpawned = false
 const MAX_SNOWMAN_COUNT = 6
 let snowmanCount = 0
-export function spawnProps(scene) {
+export function spawnProps(snowglobe) {
     // console.log(OBJ_DICT)
     // for (let i = 0; i<2*radius+1; i++) 
     //     for (let k = 0; k < 2 * radius + 1; k++) {
@@ -165,11 +165,16 @@ export function spawnProps(scene) {
     //         }  
     //     }
     
+    console.log(snowglobe)
     const randI = Math.floor(radius + 0.15*sideLen*Math.random())
     const randK = Math.floor(radius + 0.15*sideLen*Math.random())
     if (!churchSpawned) {
-        const church = spawnBlock(scene, OBJ_DICT["CHURCH"], [randI, 0, randK])
+        const church = spawnBlock(snowglobe.scene, OBJ_DICT["CHURCH"], [randI, 0, randK])
         if (church) {
+            for (const child of church.children) {
+                if (child.name.includes("Window"))
+                    snowglobe.glowObjs.push(child)
+            }
             churchSpawned = true
             church.rotation.x = 2*Math.PI
         }
@@ -180,16 +185,36 @@ export function spawnProps(scene) {
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
             if (Math.random() > 0.9) {
-                const houseSmall = spawnBlock(scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
-                if (houseSmall) houseSmall.rotation.y = Math.random() * 2 * Math.PI
+                const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
+                if (houseSmall) {
+                    houseSmall.rotation.y = Math.random() * 2 * Math.PI
+                    for (const child of houseSmall.children) {
+                        if (child.name.includes("Window")) {
+                            snowglobe.glowObjs.push(child)
+                            break
+                        }
+                    }
+                }
             } else if (Math.random() > 0.9 && snowmanCount <= MAX_SNOWMAN_COUNT) {
-                const snowman = spawnBlock(scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
+                const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
                     snowmanCount += 1
                 }
             } else if (Math.random() > 0.95) {
-                const lamp = spawnBlock(scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
+                const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
+                
+                if (lamp) {
+                    console.log(lamp.children)
+                    snowglobe.glowObjs.push(lamp.children[2])
+                    const pointLight = new THREE.PointLight(0xf5bf42, 1.0)
+                    pointLight.position.set(lamp.position.x, lamp.position.y+0.1, lamp.position.z)
+                    pointLight.distance = 1.5 * GRID_SIZE
+                    pointLight.castShadow = false
+                    pointLight.intensity = 0
+                    snowglobe.scene.add(pointLight)
+                    snowglobe.glowObjs.push(pointLight)
+                }
             }
         }
 }
