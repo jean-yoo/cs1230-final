@@ -1,7 +1,11 @@
 import * as THREE from 'three'
+import { checkCollision } from '../GenerateProps';
+
+
+
 export default class Particle {
     constructor() {
-	this.position = new THREE.Vector3(0,0,0);
+	this.position = new THREE.Vector3().randomDirection();
 	this.direction = new THREE.Vector3(0,0,0);
 	this.velocity = this.direction.clone(); 
 	this.wanderAngle = 0;
@@ -18,18 +22,27 @@ export default class Particle {
 
 	this.swim = function (particles) {
 		const forces = []
-		forces.push(
-			this.seek(new THREE.Vector3(0, 0, 0)).multiplyScalar(10),			// this.wander().multiplyScalar(3),
-			this.alignment(particles).multiplyScalar(0.01),
-			this.cohesion(particles).multiplyScalar(20),
-			this.separation(particles).multiplyScalar(2.2),
+		var collisionResult = checkCollision(this.position, 0.5)
+		if (!(collisionResult === undefined)) {
+			forces.push(this.calculateTangent(collisionResult).multiplyScalar(50),
 			this.wander().multiplyScalar(20),
-			this.separation(particles),
-			this.wander().multiplyScalar(20),)
+			this.separation(particles).multiplyScalar(2.2),)
+		} else {
+			forces.push(
+				this.seek(new THREE.Vector3(-2, 0, -2)).multiplyScalar(22),		
+				this.alignment(particles).multiplyScalar(0.01),
+				this.cohesion(particles).multiplyScalar(20),
+				this.separation(particles).multiplyScalar(2.2),
+				this.wander().multiplyScalar(20),
+				this.separation(particles),
+				this.wander().multiplyScalar(20))
+		}
+
+
 		const steeringForce = new THREE.Vector3(0, 0, 0);
     	for (const f of forces) {
-      steeringForce.add(f);
-    } steeringForce.multiplyScalar(0.01);
+      		steeringForce.add(f);
+    	} steeringForce.multiplyScalar(0.01);
 	steeringForce.setComponent(1, 0)
 	if (steeringForce.length() > 0.01) {
 		steeringForce.normalize();
@@ -50,68 +63,14 @@ export default class Particle {
 	  const frameVelocity = this.velocity.clone()
 	  frameVelocity.multiplyScalar(0.6)
 	  this.position.add(frameVelocity);
-
-		// this.velocity.randomDirection();
-		// console.log("lsdfjas", this.position.z)
-		// prevent boundary collisions
-		// var vector = new THREE.Vector3();
-		// vector.set(- _width, this.position.y, this.position.z);
-		// vector = this.avoid(vector);
-		// // vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// vector.set(_width, this.position.y, this.position.z);
-		// vector = this.avoid(vector);
-		// // vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// vector.set(this.position.x, - _height, this.position.z);
-		// vector = this.avoid(vector);
-		// // vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// vector.set(this.position.x, _height, this.position.z);
-		// vector = this.avoid(vector);
-		// // vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// vector.set(this.position.x, this.position.y, - _depth);
-		// vector = this.avoid(vector);
-		// vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// vector.set(this.position.x, this.position.y, _depth);
-		// vector = this.avoid(vector);
-		// // vector.multiplyScalar(5);
-        // vector.setComponent(1, 0); 
-		// _acceleration.add(vector);
-
-		// // if (Math.random() > 0.5) {
-		// this.flock(particles);
-		// this.velocity.add(_acceleration);
-        // // }
-        // var vector = new THREE.Vector3();
-        // // console.log("boids")
-        // vector.randomDirection();
-        // console.log(this.velocity)
-
-		// this.checkEdge(this.velocity);
-		//   console.log(this.velocity);
-        // vector.multiplyScalar(0.5);
-        // this.position.lerp(vector, 0.1);
-        // this.position.add(this.velocity);
-		// console.log(this.position)
-		// console.log(this.velocity)
-		// _acceleration.set(0, 0, 0);
-        // _acceleration.add(vector);
-
-		// this.move();
 	};
+
+	this.calculateTangent = function(collisionResult) {
+		var vec1 = new THREE.Vector3(0,0,0);
+		vec1.subVectors(this.position, collisionResult.pos)
+		vec1.addVectors(vec1.multiplyScalar(20),  new THREE.Vector3(vec1.z, vec1.y, -1 * vec1.x))
+		return vec1.normalize()
+	}; 
 
     this.checkEdge = function(vector) {
         let nedge = -3.5;
