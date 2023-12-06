@@ -9,9 +9,9 @@ import { fragmentShader } from './Shaders/frag';
 import { BG_COLOR } from './Config/Config'
 
 const BLOOM_SCENE = 1;
-const BLOOM_STRENGTH = 0.4
-const BLOOM_RADIUS = 0.01
-const BLOOM_THRESHOLD = 0.3
+const BLOOM_STRENGTH = 0.5
+const BLOOM_RADIUS = 0.4
+const BLOOM_THRESHOLD = 0.0
 
 const bloomLayer = new THREE.Layers();
 bloomLayer.set(BLOOM_SCENE);

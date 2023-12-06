@@ -16,7 +16,7 @@
 	"nodes":[
 		{
 			"mesh":0,
-			"name":"SnowBall.002",
+			"name":"Snow",
 			"translation":[
 				0.006056070327758789,
 				1.0047801733016968,
@@ -25,7 +25,7 @@
 		},
 		{
 			"mesh":1,
-			"name":"Cube.002",
+			"name":"Cube",
 			"scale":[
 				0.5,
 				0.5,
@@ -41,11 +41,6 @@
 	"materials":[
 		{
 			"doubleSided":true,
-			"emissiveFactor":[
-				0.8999999761581421,
-				0.8999999761581421,
-				0.8999999761581421
-			],
 			"name":"Material.002",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
@@ -55,7 +50,7 @@
 					1
 				],
 				"metallicFactor":0,
-				"roughnessFactor":0.4545454680919647
+				"roughnessFactor":0.10000000149011612
 			}
 		},
 		{

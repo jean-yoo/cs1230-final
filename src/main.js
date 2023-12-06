@@ -6,7 +6,7 @@ import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticle
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { bloomRender, setupBloomRendering } from './BloomRender';
 import { BG_COLOR } from './Config/Config';
-import { loadAsset, initializeWFC } from './WaveFunctionCollapse';
+import { loadAsset, initializeWFC, loadWFCAsset, initializePMF } from './WaveFunctionCollapse';
 import Stats from 'three/examples/jsm/libs/stats.module'
 
 let ASSETS_LOADED = false
@@ -52,7 +52,14 @@ setupControlPanel()
 // floor.position.set(0, 0,0)
 // scene.add(floor)
 
-loadAsset(scene).then(() => { initializeWFC(scene); ASSETS_LOADED = true; })
+loadAsset(scene)
+    .then(() => loadWFCAsset())
+    .then(NUM_WFC_BLOCKS => {
+        console.log("NUM WFC BLOCKS:", NUM_WFC_BLOCKS); 
+        initializeWFC(scene); 
+        ASSETS_LOADED = true;
+    })
+    .then(() => initializePMF())
 
 // Add some lights!
 setupLights(scene)
