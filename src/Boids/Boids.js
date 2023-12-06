@@ -234,7 +234,7 @@ export default class Particle {
 		direction = dest.clone().subVectors(dest, this.position);
 		direction.normalize();
 		direction.multiplyScalar(distance)
-		console.log(direction)
+		// console.log(direction)
 		return direction
 	  }
 

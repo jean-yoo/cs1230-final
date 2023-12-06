@@ -72,7 +72,7 @@ var sphereMaterial = new THREE.MeshPhongMaterial({
 });
 var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphere.name = "SNOW_SPHERE"
-sphere.layers.toggle(1)
+// sphere.layers.toggle(1)
 console.log(sphere)
 sphere.receiveShadow = false
 // sphere.castShadow = true
@@ -111,13 +111,13 @@ for (var i = 0; i < 12; i ++) {
 const clipPlanes = [
   new THREE.Plane( new THREE.Vector3( 0, - 1, 0 ), -2 ),
 ];
-const geometry = new THREE.SphereGeometry( 5.7, 32, 32 );
+const geometry = new THREE.SphereGeometry( 5.7, 32, 32, undefined, undefined, undefined, 1.212);
 
 const material = new THREE.MeshLambertMaterial( {
   color: 0xfffffff,
   side: THREE.DoubleSide,
-  clippingPlanes: clipPlanes,
-  clipIntersection: false
+//   clippingPlanes: clipPlanes,
+//   clipIntersection: false
 } );
 
 const circleGeometry = new THREE.CircleGeometry( 5.35, 32 ); 
@@ -128,9 +128,11 @@ var groundCap = new THREE.Mesh( circleGeometry, circleMaterial );
 groundCap.receiveShadow = true;
 groundCap.position.set(0, -2.0, 0)
 
-var groundSide = new THREE.Mesh( geometry, material );
+var groundSide = new THREE.Mesh(geometry, material);
+groundSide.rotation.z =Math.PI
+// groundSide.name = "SNOW_SPHERE"
 groundSide.receiveShadow = true;
-groundSide.add(groundCap)
+snowglobe.scene.add(groundCap)
 snowglobe.scene.add(groundSide); 
 
 

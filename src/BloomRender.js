@@ -52,7 +52,8 @@ export function setupBloomRendering(scene, camera, renderer) {
 function eraseNonBloomObj(obj) {
     if (obj.isMesh && !bloomLayer.test(obj.layers)) {
         materials[obj.uuid] = obj.material
-        obj.material = DARK_MATERIAL
+        if (obj.name == "SNOW_SPHERE") obj.material = TRANSPARENT_MATERIAL
+        else obj.material = DARK_MATERIAL
     }
 }
 
