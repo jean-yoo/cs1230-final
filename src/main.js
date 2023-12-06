@@ -9,6 +9,7 @@ import { BG_COLOR } from './Config/Config';
 import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
+import { checkCollision } from './GenerateProps';
 
 
 const snowglobe = {
@@ -89,31 +90,42 @@ snowglobe.glass = globeGlass;
 var blob, blobs, foid, foids;
 blobs = [];
 foids = [];
+var count = 0; 
 
-for (var i = 0; i < 12; i ++) {
+function spawnBoids() {
+  while (count != 10) {
     // init each particle at a random position and velocity
-    foid = foids[i] = new Particle();
+    foid = foids[count] = new Particle();
     // foid.position = new THREE.Vector3(1,1,1);
     // console.log(foid.position)
     // console.log(foid)
-    if (i >= 0 && i < 4) {
-    foid.position.x = THREE.MathUtils.randFloat(-5,-1.0); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
-    } else if (( i >= 4) && (i < 8)) {
-      foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(2.0,4.5);
-    } else {
-      foid.position.x = THREE.MathUtils.randFloat(-1, 0.9); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(1.0,1.2);
+    // if (count >= 0 && count < 4) {
+    // foid.position.x = THREE.MathUtils.randFloat(-5,-1.0); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
+    // } else if ((count >= 4) && (count < 8)) {
+    //   foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(2.0,4.5);
+    // } else {
+    //   foid.position.x = THREE.MathUtils.randFloat(-1, 0.9); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(1.0,1.2);
+    // }
+    foid.position.x = 0; foid.position.y = -1.7; foid.position.z = 0;
+    // console.log(checkCollision(foid.position, 1))
+    while (!(checkCollision(foid.position, 1) === undefined)) {
+      foid.position.x = THREE.MathUtils.randFloat(-5,5); foid.position.y = -1.7; foid.position.z = THREE.MathUtils.randFloat(-4.5,5);
+      // console.log("dasfjs")
     }
+
     // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
     // foid.setBoundaries(8, 8, 8);
 
-    blob = blobs[i] = new THREE.Mesh(
+    blob = blobs[count] = new THREE.Mesh(
         new THREE.DodecahedronGeometry(0.3),
         new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
     blob.receiveShadow = true
     blob.castShadow = true
-    blob.position.copy(foids[i].position)
+    blob.position.copy(foids[count].position)
     // blob.state = Math.ceil(Math.random() * 15);
     snowglobe.scene.add(blob);
+    count++; 
+}
 }
 // Add a floor..
 const clipPlanes = [

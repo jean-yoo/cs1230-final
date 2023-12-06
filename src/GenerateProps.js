@@ -2,12 +2,12 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 
 const loader = new GLTFLoader()
-var radius = 5 // number of blocks for the FLOOR
+var radius = 4 // number of blocks for the FLOOR
 var height = 4 // number of blocks for anything above the floor
 var sideLen = 2 * radius + 1
 var grid = new Array(Math.pow(2 * radius + 1, 2) * height) // corresponding to x, y, and z
 for (let i = 0; i < grid.length; i++) grid[i] = -1;
-const GRID_SIZE = 0.8
+const GRID_SIZE = 0.7
 
 const BLOCKTYPE = {
     NONE: -1,
@@ -137,17 +137,21 @@ export function initializeScene(scene) {
     spawnBlock(scene, OBJ_DICT["SNOW_FULL_HEIGHT"], [1, 0, 1])
 }
 
-function checkCollision(pos, br) {
+export function checkCollision(pos, br) {
     for (const body of collisionBoxes) {
         const dx = pos.x - body.pos.x
         const dy = pos.y - body.pos.y
         const dz = pos.z - body.pos.z
-        const r2 = dx * dx + dy * dy + dz * dz 
+        const r2 = dx * dx  + dz * dz 
         const minDist = (body.boundingRadius + br) * GRID_SIZE
-        if (r2 < minDist*minDist) return true
+    //     if (body.type == BLOCKTYPE.CHURCH) {
+    //     console.log(r2, minDist*minDist)
+    // }
+    // console.log(body.type)
+        if (r2 < minDist*minDist) {return body }
     }
 
-    return false 
+    return undefined
 }
 
 let churchSpawned = false
