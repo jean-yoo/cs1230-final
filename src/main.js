@@ -119,7 +119,7 @@ function spawnBoids() {
 
     blob = blobs[count] = new THREE.Mesh(
         new THREE.DodecahedronGeometry(0.3),
-        new THREE.MeshPhongMaterial( { color: 0xC54245 } ));
+        new THREE.MeshPhongMaterial( { color: "rgb(71, 50, 36)" } ));
     blob.receiveShadow = true
     blob.castShadow = true
     blob.position.copy(foids[count].position)
@@ -153,6 +153,7 @@ var groundSide = new THREE.Mesh(geometry, material);
 groundSide.rotation.z =Math.PI
 // groundSide.name = "SNOW_SPHERE"
 groundSide.receiveShadow = true;
+groundSide.castShadow = true;
 snowglobe.scene.add(groundCap)
 snowglobe.scene.add(groundSide); 
 
