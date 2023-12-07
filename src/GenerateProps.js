@@ -188,7 +188,7 @@ export function spawnProps(snowglobe) {
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
-            if (Math.random() > 0.9) {
+            if (Math.random() > 0.6) {
                 const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
                 if (houseSmall) {
                     houseSmall.rotation.y = Math.random() * 2 * Math.PI

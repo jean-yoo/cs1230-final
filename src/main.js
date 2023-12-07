@@ -10,6 +10,7 @@ import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
+import { CircularPerlinMesh } from './Perlin';
 
 
 const snowglobe = {
@@ -167,17 +168,18 @@ generateSnowParticles(snowglobe.scene)
 
 // Setup post-processing steps for selective bloom
 setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
-console.log(foids)
+// console.log(foids)
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
 
-const GLOBE_BLOOM = { off:0, on:1} 
+const GLOBE_BLOOM = { off:0, on:1 } 
 let globeBloom = GLOBE_BLOOM.off
 const isNight = () => snowglobe.params.timeOfDay<8.5 || snowglobe.params.timeOfDay>18.5
+
 function animate() {
     requestAnimationFrame(animate);
-    if (!ASSETS_LOADED) return 
+    if (!ASSETS_LOADED) return
     if (!propsGenerated) {
         spawnProps(snowglobe); 
         spawnBoids()
@@ -210,8 +212,9 @@ function animate() {
 
     // This function call abstracts away post-processing steps
     bloomRender(snowglobe.scene)
+    snowglobe.params.timeOfDay += 0.05
+    if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0 
     updateLighting(snowglobe)
-
     stats.update()
 }
 animate();
