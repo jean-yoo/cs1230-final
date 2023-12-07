@@ -16,6 +16,7 @@ export function generateSnowParticles(scene) {
     const particleMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size:0.1 });
     const newParticleSystem = new THREE.Points(particles, particleMaterial);
     newParticleSystem.layers.toggle(1)
+    newParticleSystem.name = "SnowParticle"
     scene.add(newParticleSystem)
     particleSystems.push(newParticleSystem)
 }

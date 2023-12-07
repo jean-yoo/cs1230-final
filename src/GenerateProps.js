@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { outlineShader } from './Shaders/outline'
+import { EDGE_LAYER } from './Rendering'
 
 const loader = new GLTFLoader()
 var radius = 4 // number of blocks for the FLOOR
@@ -69,7 +71,27 @@ function loadAssetHelper(path, objName) {
 
 
 let collisionBoxes = []
-function spawnBlock(scene, prototype, idx, visualizeBounds = false, ignoreCollision = false) {
+const OUTLINE_THICKNESS = 0.08
+// const outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })
+const outlineMaterial = new THREE.ShaderMaterial({
+    uniforms: {
+        GRID_SIZE: { value: GRID_SIZE },
+        thickness: { value: OUTLINE_THICKNESS }
+    },
+    vertexShader: outlineShader.vert,
+    fragmentShader: outlineShader.frag,
+    side: THREE.BackSide
+})
+
+export function addOutline(scene, obj) {
+    const outlineClone = obj.clone()
+    if (obj.material)
+        obj.material = outlineMaterial
+    for (const child of outlineClone.children) { child.material = outlineMaterial }
+    scene.add(outlineClone)
+    return outlineClone
+}
+function spawnBlock(scene, prototype, idx, visualizeBounds = false, ignoreCollision = false, outline = true) {
     const pos = idxToPos(idx[0], idx[1], idx[2])
     const br = BOUNDING_RADIUS[prototype.name]
     if (!ignoreCollision) {if (checkCollision(pos, br)) return }
@@ -86,8 +108,14 @@ function spawnBlock(scene, prototype, idx, visualizeBounds = false, ignoreCollis
     const blockClone = prototype.obj.clone()
     blockClone.position.set(pos.x, pos.y, pos.z)
     scene.add(blockClone)
+    // if(outline)
+    //     addOutline(scene, blockClone)
+
     grid[getIdx(idx[0], idx[1], idx[2])] = prototype.type
-    if (!ignoreCollision) {collisionBoxes.push({ objType: prototype.type, pos: pos, boundingRadius: br })}
+    if (!ignoreCollision) { collisionBoxes.push({ objType: prototype.type, pos: pos, boundingRadius: br }) }
+    
+    // const g = new THREE.Group()
+    // scene.add(g)
     return blockClone
 }
 
@@ -139,14 +167,6 @@ export async function loadAsset() {
     return await loadAssetHelper('../assets/brick_block.gltf', "BRICK_BLOCK")
 }
 
-export function initializeScene(scene) {
-    console.log(OBJ_DICT)
-    spawnBlock(scene, OBJ_DICT["SNOW_FULL_HEIGHT"], [0, 0, 1])
-    spawnBlock(scene, OBJ_DICT["BRICK_BLOCK"], [0, 0, 0])
-    spawnBlock(scene, OBJ_DICT["BRICK_BLOCK"], [1, 0, 0])
-    spawnBlock(scene, OBJ_DICT["SNOW_FULL_HEIGHT"], [1, 0, 1])
-}
-
 export function checkCollision(pos, br) {
     for (const body of collisionBoxes) {
         const dx = pos.x - body.pos.x
@@ -178,7 +198,11 @@ export function spawnProps(snowglobe) {
     //             else spawnBlock(scene, OBJ_DICT["BRICK_BLOCK"], [i, 0, k])
     //         }  
     //     }
-    spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true).rotation.x = -Math.PI;
+    const base = spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true, false)//.rotation.x = -Math.PI;
+    if (base) {
+        base.rotation.x = -Math.PI
+        addOutline(snowglobe.scene, base)
+    }
     // console.log(snowglobe)
     const randI = Math.floor(radius + 0.15*sideLen*Math.random())
     const randK = Math.floor(radius + 0.15*sideLen*Math.random())
@@ -190,10 +214,11 @@ export function spawnProps(snowglobe) {
                     snowglobe.glowObjs.push(child)
             }
             churchSpawned = true
-            church.rotation.x = 2*Math.PI
+            church.rotation.x = 2 * Math.PI
+            addOutline(snowglobe.scene, church)
         }
+        console.log(church.isMesh && EDGE_LAYER.test(church.layers))
     }
-    console.log(collisionBoxes)
 
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
@@ -208,18 +233,19 @@ export function spawnProps(snowglobe) {
                             break
                         }
                     }
+                    addOutline(snowglobe.scene, houseSmall)
                 }
             } else if (Math.random() > 0.85 && snowmanCount <= MAX_SNOWMAN_COUNT) {
                 const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
                     snowmanCount += 1
-            }
+                    addOutline(snowglobe.scene, snowman)
+                }
             } else if (Math.random() > 0.9) {
                 const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
                 
                 if (lamp) {
-                    console.log(lamp.children)
                     snowglobe.glowObjs.push(lamp.children[2])
                     const pointLight = new THREE.PointLight(0xf5bf42, 1.0)
                     pointLight.position.set(lamp.position.x, lamp.position.y+0.1, lamp.position.z)
@@ -228,11 +254,13 @@ export function spawnProps(snowglobe) {
                     pointLight.intensity = 0
                     snowglobe.scene.add(pointLight)
                     snowglobe.glowObjs.push(pointLight)
+                    addOutline(snowglobe.scene, lamp)
                 }
             } else if ((Math.random() > 0.7)) {
                 const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
                 if (present) {
                     present.rotation.y = Math.random() * 2 * Math.PI
+                    addOutline(snowglobe.scene, present)
                 }
             }
     }

@@ -11,7 +11,7 @@ function dot(a,b) {
 
 const ease = (alpha) => 3*alpha*alpha - 2*alpha*alpha*alpha
 const interpolate = (a,b,alpha)=>a+ease(alpha)*(b-a)
-const LOOKUP_SIZE = 2048
+const LOOKUP_SIZE = 1024
 class Perlin {
     grid
     m
@@ -20,7 +20,8 @@ class Perlin {
     constructor(m,n,freqs=[1]) {
         this.m = m
         this.n = n
-        this.grid = new Array(m*n)
+        // this.grid = new Array(m * n)
+        this.grid = new Array(LOOKUP_SIZE)
         this.freqs = freqs
         for (let i=0; i<this.grid.length; i++) {
             const randV = new Array(2)
@@ -37,7 +38,8 @@ class Perlin {
         // console.log( Math.floor(i*7 + j*11) )
         // const idx = Math.abs(Math.floor(i*7 + j*11)) % LOOKUP_SIZE
         // console.log(col,row)
-        const v = this.grid[(row%this.m)*this.m + col%this.n]
+        // const v = this.grid[(row%this.m)*this.m + col%this.n]
+        const v = this.grid[(row*13 + col*23) % LOOKUP_SIZE]
         // console.log(v)
         return v
     }
@@ -84,14 +86,20 @@ function addVertexToArr(v, a) {
 }
 
 export function CircularPerlinMesh(size, res) {
-    const perlin = new Perlin(res, res, [4,8])
+    const perlin = new Perlin(res, res, [8,16,32])
     // const gridSize = res / radius
     let vertices = []
+    let indices = []
+    const center = res/2
     for (let i=0; i<res; i++) {
         for (let j=0; j<res; j++) {
             const x1 = j; const x2 = x1+1
-            const z1 = i; const z2 = z1+1
-
+            const z1 = i; const z2 = z1 + 1
+            // Only generate within a circle 
+            if ((x1 - center) * (x1 - center) + (z1 - center) * (z1 - center) > center * center
+                || (x2 - center) * (x2 - center) + (z2 - center) * (z2 - center) > center * center)
+            continue
+            
             const p1 = perlin.getPosition(x1/res,z1/res)
             const p2 = perlin.getPosition(x1/res,z2/res)
             const p3 = perlin.getPosition(x2/res,z1/res)
@@ -99,6 +107,9 @@ export function CircularPerlinMesh(size, res) {
 
             addVertexToArr(p1, vertices); addVertexToArr(p2, vertices); addVertexToArr(p3, vertices);
             addVertexToArr(p3, vertices); addVertexToArr(p2, vertices); addVertexToArr(p4, vertices);
+
+            indices.push(x1 * res + z1); indices.push(x1 * res + z2); indices.push(x2 * res + z1);
+            indices.push(x2 * res + z1); indices.push(x1 * res + z2); indices.push(x2 * res + z2);
         }
     }
     
@@ -116,16 +127,16 @@ export function CircularPerlinMesh(size, res) {
     const fiveTone = new THREE.TextureLoader().load('../assets/ToonShadingGradientMaps/fiveTone.jpg')
     fiveTone.minFilter = THREE.NearestFilter
     fiveTone.magFilter = THREE.NearestFilter
-    const snowToonMaterial = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: fiveTone })
+    const snowToonMaterial = new THREE.MeshToonMaterial({ color: "rgb(230, 225, 223)", gradientMap: fiveTone })
     // const mat = new THREE.MeshPhongMaterial({color:0xffffff})
-    const geom = new THREE.BufferGeometry()
+    let geom = new THREE.BufferGeometry()
+    geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    geom.deleteAttribute("normal")
+    geom = BufferGeometryUtils.mergeVertices(geom);
+    console.log(geom)
     geom.computeVertexNormals()
-    geom.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) )
 
-    const mergeGeom = BufferGeometryUtils.mergeVertices(geom, 0.25);
-    mergeGeom.computeVertexNormals(true);
-
-    const mesh = new THREE.Mesh(mergeGeom, snowToonMaterial)
+    const mesh = new THREE.Mesh(geom, snowToonMaterial)
     mesh.scale.set(size,size,size)
     return mesh
 }
