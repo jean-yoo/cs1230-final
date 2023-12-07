@@ -16,14 +16,18 @@ const BLOCKTYPE = {
     CHURCH: 2,
     LAMP: 3,
     HOUSE_SMALL: 4,
-    SNOWMAN_DERPY: 1
+    SNOWMAN_DERPY: 1,
+    BASE: 0,
+    PRESENTS: 5
 }
 
 const BOUNDING_RADIUS = {
     HOUSE_SMALL: 1,
     LAMP: 0,
     CHURCH: 3,
-    SNOWMAN_DERPY: 1
+    SNOWMAN_DERPY: 1,
+    BASE: 0,
+    PRESENTS: 0.5
 }
 
 function getIdx(i, j, k) {
@@ -65,25 +69,25 @@ function loadAssetHelper(path, objName) {
 
 
 let collisionBoxes = []
-function spawnBlock(scene, prototype, idx, visualizeBounds = true) {
+function spawnBlock(scene, prototype, idx, visualizeBounds = false, ignoreCollision = false) {
     const pos = idxToPos(idx[0], idx[1], idx[2])
     const br = BOUNDING_RADIUS[prototype.name]
-    if (checkCollision(pos, br)) return 
+    if (!ignoreCollision) {if (checkCollision(pos, br)) return }
 
-    if (visualizeBounds) {
-        const geometry = new THREE.RingGeometry((br-0.03)*GRID_SIZE, br*GRID_SIZE, 32);
-        const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(pos.x, pos.y+0.2, pos.z)
-        mesh.rotation.x = Math.PI / 2;
-        scene.add(mesh);
-    }
+    // if (visualizeBounds) {
+    //     const geometry = new THREE.RingGeometry((br-0.03)*GRID_SIZE, br*GRID_SIZE, 32);
+    //     const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
+    //     const mesh = new THREE.Mesh(geometry, material);
+    //     mesh.position.set(pos.x, pos.y+0.2, pos.z)
+    //     mesh.rotation.x = Math.PI / 2;
+    //     scene.add(mesh);
+    // }
 
     const blockClone = prototype.obj.clone()
     blockClone.position.set(pos.x, pos.y, pos.z)
     scene.add(blockClone)
     grid[getIdx(idx[0], idx[1], idx[2])] = prototype.type
-    collisionBoxes.push({ objType: prototype.type, pos: pos, boundingRadius: br })
+    if (!ignoreCollision) {collisionBoxes.push({ objType: prototype.type, pos: pos, boundingRadius: br })}
     return blockClone
 }
 
@@ -93,6 +97,8 @@ export async function loadAsset() {
     await loadAssetHelper('../assets/snowman_derpy.gltf', "SNOWMAN_DERPY")
     await loadAssetHelper('../assets/church.gltf', "CHURCH")
     await loadAssetHelper('../assets/lamp.gltf', "LAMP")
+    await loadAssetHelper('../assets/base.gltf', "BASE")
+    await loadAssetHelper('../assets/presents.gltf', "PRESENTS")
 
     const threeTone = new THREE.TextureLoader().load('../assets/ToonShadingGradientMaps/threeTone.jpg')
     threeTone.minFilter = THREE.NearestFilter
@@ -100,6 +106,7 @@ export async function loadAsset() {
 
     const hatToonMaterial = new THREE.MeshToonMaterial({ color: 0x2FC5FF, gradientMap: threeTone })
     const snowToonMaterial = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: threeTone })
+    const baseToonMaterial = new THREE.MeshToonMaterial({ color: "rgb(71, 50, 36)", gradientMap: threeTone })
 
     OBJ_DICT["SNOW_FULL_HEIGHT"].obj.children[0].material = snowToonMaterial
 
@@ -124,6 +131,9 @@ export async function loadAsset() {
     for (const child of OBJ_DICT["LAMP"].obj.children) {
         if (child.name.includes("light")) child.material = new THREE.MeshToonMaterial({ color: 0xfffff0, gradientMap: threeTone })
         else child.material = new THREE.MeshToonMaterial({ color: 0x000000, gradientMap: threeTone })
+    }
+    for (const child of OBJ_DICT["BASE"].obj.children) {
+        child.material = baseToonMaterial
     }
 
     return await loadAssetHelper('../assets/brick_block.gltf', "BRICK_BLOCK")
@@ -168,8 +178,8 @@ export function spawnProps(snowglobe) {
     //             else spawnBlock(scene, OBJ_DICT["BRICK_BLOCK"], [i, 0, k])
     //         }  
     //     }
-    
-    console.log(snowglobe)
+    spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true).rotation.x = -Math.PI;
+    // console.log(snowglobe)
     const randI = Math.floor(radius + 0.15*sideLen*Math.random())
     const randK = Math.floor(radius + 0.15*sideLen*Math.random())
     if (!churchSpawned) {
@@ -188,7 +198,7 @@ export function spawnProps(snowglobe) {
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
-            if (Math.random() > 0.9) {
+            if (Math.random() > 0.7) {
                 const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
                 if (houseSmall) {
                     houseSmall.rotation.y = Math.random() * 2 * Math.PI
@@ -199,13 +209,13 @@ export function spawnProps(snowglobe) {
                         }
                     }
                 }
-            } else if (Math.random() > 0.9 && snowmanCount <= MAX_SNOWMAN_COUNT) {
+            } else if (Math.random() > 0.85 && snowmanCount <= MAX_SNOWMAN_COUNT) {
                 const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
                     snowmanCount += 1
-                }
-            } else if (Math.random() > 0.95) {
+            }
+            } else if (Math.random() > 0.9) {
                 const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
                 
                 if (lamp) {
@@ -219,6 +229,11 @@ export function spawnProps(snowglobe) {
                     snowglobe.scene.add(pointLight)
                     snowglobe.glowObjs.push(pointLight)
                 }
+            } else if ((Math.random() > 0.7)) {
+                const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
+                if (present) {
+                    present.rotation.y = Math.random() * 2 * Math.PI
+                }
             }
-        }
+    }
 }
