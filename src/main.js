@@ -116,9 +116,10 @@ loadAsset().then(() => { ASSETS_LOADED = true; })
 // Add some lights!
 setupLights(snowglobe.scene, snowglobe)
 genBgLights(snowglobe.scene)
-generateSnowParticles(snowglobe.scene)
+// generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 setupMasterRendering(snowglobe.scene, camera, snowglobe.renderer)
+generateSnowParticles(snowglobe.scene)
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
@@ -138,10 +139,10 @@ function animate() {
   }
   cameraPan.update()
 
-  if (clock.getElapsedTime() - genTime > 2) {
-    generateSnowParticles(snowglobe.scene)
-    genTime = clock.getElapsedTime()
-  }
+  // if (clock.getElapsedTime() - genTime > 2) {
+  //   generateSnowParticles(snowglobe.scene)
+  //   genTime = clock.getElapsedTime()
+  // }
   for (var i = 0, n = blobs.length; i < n; i++) {
     foid = foids[i];
     foid.swim(foids);

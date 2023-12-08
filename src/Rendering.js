@@ -78,7 +78,7 @@ export function setupMasterRendering(scene, camera, renderer) {
         }))
     const outputPass = new OutputPass()
     combineComposer.addPass(combinePass)
-    combineComposer.addPass(edgePass)
+    // combineComposer.addPass(edgePass)
     combineComposer.addPass(outputPass)
 }
 
