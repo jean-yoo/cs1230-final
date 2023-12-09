@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { outlineShader } from './Shaders/outline'
-import { EDGE_LAYER } from './Rendering'
+// import { EDGE_LAYER } from './Rendering'
 
 const loader = new GLTFLoader()
 var radius = 4 // number of blocks for the FLOOR
@@ -201,24 +201,24 @@ export function spawnProps(snowglobe) {
     const base = spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true, false)//.rotation.x = -Math.PI;
     if (base) {
         base.rotation.x = -Math.PI
-        addOutline(snowglobe.scene, base)
+        // addOutline(snowglobe.scene, base)
     }
     // console.log(snowglobe)
     const randI = Math.floor(radius + 0.15*sideLen*Math.random())
     const randK = Math.floor(radius + 0.15*sideLen*Math.random())
-    if (!churchSpawned) {
-        const church = spawnBlock(snowglobe.scene, OBJ_DICT["CHURCH"], [randI, 0, randK])
-        if (church) {
-            for (const child of church.children) {
-                if (child.name.includes("Window"))
-                    snowglobe.glowObjs.push(child)
-            }
-            churchSpawned = true
-            church.rotation.x = 2 * Math.PI
-            addOutline(snowglobe.scene, church)
-        }
-        console.log(church.isMesh && EDGE_LAYER.test(church.layers))
-    }
+    // if (!churchSpawned) {
+    //     const church = spawnBlock(snowglobe.scene, OBJ_DICT["CHURCH"], [randI, 0, randK])
+    //     if (church) {
+    //         for (const child of church.children) {
+    //             if (child.name.includes("Window"))
+    //                 snowglobe.glowObjs.push(child)
+    //         }
+    //         churchSpawned = true
+    //         church.rotation.x = 2 * Math.PI
+    //         // addOutline(snowglobe.scene, church)
+    //     }
+    //     console.log(church.isMesh && EDGE_LAYER.test(church.layers))
+    // }
 
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
@@ -233,14 +233,14 @@ export function spawnProps(snowglobe) {
                             break
                         }
                     }
-                    addOutline(snowglobe.scene, houseSmall)
+                    // addOutline(snowglobe.scene, houseSmall)
                 }
             } else if (Math.random() > 0.85 && snowmanCount <= MAX_SNOWMAN_COUNT) {
                 const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
                     snowmanCount += 1
-                    addOutline(snowglobe.scene, snowman)
+                    // addOutline(snowglobe.scene, snowman)
                 }
             } else if (Math.random() > 0.9) {
                 const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
@@ -254,13 +254,13 @@ export function spawnProps(snowglobe) {
                     pointLight.intensity = 0
                     snowglobe.scene.add(pointLight)
                     snowglobe.glowObjs.push(pointLight)
-                    addOutline(snowglobe.scene, lamp)
+                    // addOutline(snowglobe.scene, lamp)
                 }
             } else if ((Math.random() > 0.7)) {
                 const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
                 if (present) {
                     present.rotation.y = Math.random() * 2 * Math.PI
-                    addOutline(snowglobe.scene, present)
+                    // addOutline(snowglobe.scene, present)
                 }
             }
     }

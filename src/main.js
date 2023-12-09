@@ -4,13 +4,15 @@ import { setupLights, updateLighting } from './Objects/Lights';
 import { genBgLights, moveLights } from './Objects/BgLights';
 import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { masterRender, setupMasterRendering, BLOOM_LAYER } from './Rendering';
+import { bloomRender, BLOOM_LAYER, setupBloomRendering } from './Rendering';
 import { BG_COLOR } from './Config/Config';
 import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
 import { generateGlobeAndGround } from './Objects/GlobeSetup';
+import { OutlineEffect } from '../OutlineEffect';
+let effect;  
 
 const snowglobe = {
   gui: undefined,
@@ -63,6 +65,9 @@ document.body.appendChild(snowglobe.renderer.domElement);
 // Setup FPS stats panel
 const stats = new Stats()
 document.body.appendChild(stats.dom)
+
+effect = new OutlineEffect( snowglobe.renderer );
+effect.enabled = true
 
 // Setup camera rotation on mouse click
 const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
@@ -120,8 +125,9 @@ setupLights(snowglobe.scene, snowglobe)
 genBgLights(snowglobe.scene)
 // generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
-setupMasterRendering(snowglobe.scene, camera, snowglobe.renderer)
+setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
 generateSnowParticles(snowglobe.scene)
+snowglobe.params.timeOfDay = 11
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
@@ -159,7 +165,7 @@ function animate() {
   moveLights(camera, clock)
 
   // This function call abstracts away post-processing steps
-  masterRender(snowglobe.scene)
+  bloomRender(snowglobe.scene)
 
   // Turn the lights off at night
   if (isNight() && globeBloom == GLOBE_BLOOM.off) {
