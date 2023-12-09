@@ -66,6 +66,8 @@ document.body.appendChild(stats.dom)
 
 // Setup camera rotation on mouse click
 const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
+cameraPan.enableDamping = true
+cameraPan.dampingFactor = 0.03
 
 // Setup a GUI with our paralocalmeters
 setupControlPanel(snowglobe)
