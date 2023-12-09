@@ -1,9 +1,29 @@
 import * as THREE from 'three'
 
+export function getRand() {
+  var randomAngle = Math.random() * 2 * Math.PI;
+  var randomRadius = Math.random() * (4.8 - 3.0) + 3.0;
+  var x = randomRadius * Math.cos(randomAngle);
+  var z = randomRadius * Math.sin(randomAngle);
+  
+  return { x: x, z: z };
+}
+
+export function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+export function randi(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin) {
     var branchesParent = new THREE.Object3D();
 
     var x = 0, y = 0;
+    const textureLoader = new THREE.TextureLoader();
+    const treeTexture = textureLoader.load('../pineTexture.jpg');
+    const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5});
     function addBranch(count, x, y, z, opts) {
         var points2 = [];
         var l;
@@ -18,8 +38,7 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
         }
         var branchShape = new THREE.Shape(points2);
         var branchGeometry = new THREE.ExtrudeGeometry(branchShape, opts);
-        var treemat = new THREE.MeshStandardMaterial({color:0x004011,emissive:0x004011,roughness:0.8});
-        var branchMesh = new THREE.Mesh(branchGeometry, treemat);
+        var branchMesh = new THREE.Mesh(branchGeometry, treeMaterial);
 
         branchMesh.scale.set(1/(90*skin*scale),skin/(90*scale),1/(90*skin*scale));
         if (y == 0) branchMesh.position.set(DELTAX, 0, DELTAZ);
@@ -34,7 +53,7 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
     amount: 2,
     bevelEnabled: true,
     bevelSegments: 1,
-    bevelThickness: 10/scale,
+    bevelThickness: 3/scale,
     steps: 5,
     depth: 40
     };
@@ -43,6 +62,8 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
     var iBranchCnt = branches;
     for (var i1 = 0; i1 <= iBranchCnt; i1++) {
         addBranch(iBranchCnt + 3 - i1, DELTAX, -branches + i1, DELTAZ, options);
+        options.bevelThickness = rand(2.5/scale, 3.5/scale);
+        options.bevelSegments = randi(1, 3);
     }
     
     return branchesParent;

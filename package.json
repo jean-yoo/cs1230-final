@@ -2,7 +2,8 @@
   "dependencies": {
     "@tweenjs/tween.js": "^21.0.0",
     "gsap": "^3.12.3",
-    "three": "^0.158.0"
+    "three": "^0.158.0",
+    "web-audio-api": "^0.2.2"
   },
   "devDependencies": {
     "vite": "^5.0.5"
