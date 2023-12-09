@@ -12,6 +12,7 @@ import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
 import { generateGlobeAndGround } from './Objects/GlobeSetup';
 import { OutlineEffect } from '../OutlineEffect';
+import { genTree, genStar, plotSnow, getRand, rand, randi } from './Objects/TreeSnow';
 let effect;  
 
 const snowglobe = {
@@ -73,6 +74,7 @@ effect.enabled = true
 const cameraPan = new OrbitControls(camera, snowglobe.renderer.domElement)
 cameraPan.enableDamping = true
 cameraPan.dampingFactor = 0.03
+cameraPan.maxPolarAngle = Math.PI / 1.6
 
 // Setup a GUI with our paralocalmeters
 setupControlPanel(snowglobe)
@@ -126,8 +128,96 @@ genBgLights(snowglobe.scene)
 // generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
-generateSnowParticles(snowglobe.scene)
+//generateSnowParticles(snowglobe.scene)
 snowglobe.params.timeOfDay = 18.431
+
+/*
+Tree and Snow
+*/
+snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
+const NUM_TREES = 40;
+const SNOW_COUNT = 400;
+
+// MAIN TREE w/ STAR
+snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1));
+const starGeometry = genStar(5, 10); // Function to create star geometry
+const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+const star = new THREE.Mesh(starGeometry, starMaterial);
+star.scale.set(0.03, 0.03, 0.03);
+star.rotation.z += 0.3;
+
+var pivotPoint = new THREE.Vector3(0.5, 0.1, -0.05);
+var pivotContainer = new THREE.Object3D();
+pivotContainer.add(star);
+pivotContainer.position.copy(pivotPoint);
+snowglobe.scene.add(pivotContainer);
+
+// Randomly scattered trees
+var tree, newPosition;
+for (let i = 0.0; i < NUM_TREES; i++) {
+  do {
+    var tmp = getRand();
+    if (i/NUM_TREES > 0.80) {
+      tree = genTree(snowglobe, 2, 14, tmp.x, 0, tmp.z, 0.8);
+      newPosition = new THREE.Vector3(0, -1, 0);
+      tree.position.copy(newPosition);
+    }
+    else if (i/NUM_TREES > 0.4) {
+      tree = genTree(snowglobe, 3, 14, tmp.x, 0, tmp.z, 1.2);
+      newPosition = new THREE.Vector3(0, -1.5, 0);
+      tree.position.copy(newPosition);
+    }
+    else {
+      tree = genTree(snowglobe, 5, 14, tmp.x, 0, tmp.z, 0.8);
+      newPosition = new THREE.Vector3(0, -1.5, 0);
+      tree.position.copy(newPosition);
+    }
+  } while (!(checkCollision(tree.position, 1) === undefined));
+  snowglobe.scene.add(tree);
+}
+
+
+// ADDING SNOW
+var snow = new THREE.Group();
+var snowPath = new THREE.Path();
+plotSnow(snowPath);
+
+var points = snowPath.getPoints();
+var velocities = [];
+var rotationalVelocities = [];
+
+function reSnow(idx) {
+  var n = Math.acos(-1+(2 * idx )/ 200)
+        , t = Math.sqrt(200 * Math.PI) * n;
+  mesh = snow.children[idx];
+  mesh.position.x = (150 * Math.sin( n) * Math.cos( t))/40;
+  mesh.position.y=(Math.random()*(150-(-150))-150)/60 + 3;
+  mesh.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/40;
+}
+
+for (var i=0;i<SNOW_COUNT;i++){
+  var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  var material = new THREE.LineBasicMaterial( { color: 0xffffff ,side: THREE.DoubleSide } );
+  var mesh = new THREE.Line(geometry, material );
+  var lineObject = new THREE.Object3D();
+  lineObject.add(mesh);
+  lineObject.scale.set(0.05,0.05,0.05);
+  var n = Math.acos(-1+(2 * i )/ 200), t = Math.sqrt(200 * Math.PI) * n;
+  lineObject.position.x = (150 * Math.sin( n) * Math.cos( t))/30;
+  lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
+  lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
+
+  const velocity = new THREE.Vector3(rand(-2,2),rand(-1,-3),0);
+  velocities.push(velocity);
+  const rot = randi(0,3);
+  var rotationalVelocity;
+  if(rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
+  if(rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
+  if(rot === 2) rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
+  rotationalVelocities.push(rotationalVelocity);
+  snow.add(lineObject);
+}
+snowglobe.scene.add(snow);
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
@@ -161,8 +251,29 @@ function animate() {
     blob.rotation.z = 0.06 * Math.asin(foid.velocity.y / foid.velocity.length());
   }
 
-  moveSnowParticles(snowglobe.scene)
+  //moveSnowParticles(snowglobe.scene)
+  // new particle movement
+  for (var i = 0; i < snow.children.length; i++) {
+    if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
+      + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
+    else {
+      var v = velocities[i];
+      var rv = rotationalVelocities[i];
+      snow.children[i].position.x += v.x/200;
+      snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay-12)+1) / 3)*v.y/200;
+      snow.children[i].position.z += v.z/200;
+      
+      snow.children[i].rotation.x += rv.x / 2000;
+      snow.children[i].rotation.y += rv.y / 2000;
+      snow.children[i].rotation.z += rv.z / 2000;
+    }
+  }
   moveLights(camera, clock)
+  pivotContainer.rotation.z += 0.01;
+  const time = Date.now() * 0.001;
+  const flashSpeed = 0.5;
+  const intensity = Math.abs(Math.sin(time * flashSpeed));
+  starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
 
   // This function call abstracts away post-processing steps
   bloomRender(snowglobe.scene)
@@ -177,7 +288,10 @@ function animate() {
   }
 
   //auto-run
-  // snowglobe.params.timeOfDay += 0.05
+  snowglobe.params.timeOfDay += 0.02;
+  if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
+  if (isNight()) snowglobe.scene.fog.density += 0.0003;
+  else snowglobe.scene.fog.density -= 0.0003;
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
 
   updateLighting(snowglobe)
@@ -195,3 +309,20 @@ function onWindowResize(){
     snowglobe.renderer.setSize( window.innerWidth, window.innerHeight );
 
 }
+
+// AUDIO
+var listener = new THREE.AudioListener();
+camera.add( listener );
+
+// create a global audio source
+var sound = new THREE.Audio( listener );
+
+var audioLoader = new THREE.AudioLoader();
+
+//Load a sound and set it as the Audio object's buffer
+audioLoader.load('../song.mp3', function( buffer ) {
+    sound.setBuffer( buffer );
+    sound.setLoop(true);
+    sound.setVolume(0.2);
+    sound.play();
+});
