@@ -35,9 +35,9 @@ export function generateSnowParticles(scene) {
     var tex = new THREE.TextureLoader().load("https://threejs.org/examples/textures/sprites/disc.png");
 
 
-    const flakeMaterial = new THREE.PointsMaterial({ map: tex, size:0.1,transparent:true,
-        depthWrite: false });
-
+    // const flakeMaterial = new THREE.PointsMaterial({ map: tex, size:0.2,transparent:true,
+    //     depthWrite: true});
+    const flakeMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size:0.1 });
     particles = new THREE.Points(geometry, flakeMaterial)
     scene.add(particles)
 

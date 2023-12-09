@@ -127,7 +127,7 @@ genBgLights(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
 generateSnowParticles(snowglobe.scene)
-snowglobe.params.timeOfDay = 11
+snowglobe.params.timeOfDay = 18.431
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
@@ -184,3 +184,14 @@ function animate() {
   stats.update()
 }
 animate();
+
+window.addEventListener( 'resize', onWindowResize, false );
+
+function onWindowResize(){
+
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    snowglobe.renderer.setSize( window.innerWidth, window.innerHeight );
+
+}

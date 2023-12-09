@@ -49,10 +49,10 @@ export function moveLights(camera, clock) {
         circle.position.z = RADIUS * Math.sin(newZTheta)
         circObj.zTheta = newZTheta
         circObj.mesh.opacity *= 0
-        console.log(camera.position.distanceTo(circle.position))
+        //console.log(camera.position.distanceTo(circle.position))
         if (Math.abs(camera.position.distanceTo(circle.position)) * 0.1 < 0.8) {
             circle.layers.disable(1)
-            if (Math.abs(camera.position.distanceTo(circle.position)) * 0.1 < 0.5) {
+            if (Math.abs(camera.position.distanceTo(circle.position)) * 0.1 < 0.6) {
             circObj.mesh.visible = false
             } else {
             circle.opacity *= camera.position.distanceTo(circle.position) * 0.001

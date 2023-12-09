@@ -12,6 +12,19 @@ export function generateGlobeAndGround(snowglobe) {
         shininess: 100,
     });
     var globeGlass = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    // const g_geometry = new THREE.SphereGeometry(6, 32, 32);
+    // const g_material = new THREE.MeshPhysicalMaterial({
+    //   color: "white",
+    //   clearcoat: 1,
+    //   roughness: 0.01,
+    //   metalness: 0.0,
+    //   opacity: 0.1,
+    //   transmission: 1,
+    //   reflectivity: 0.2,
+    //   ior: 1,
+    //   thickness: 0.0001
+    // });
+    // var globeGlass = new THREE.Mesh(g_geometry, g_material);
     globeGlass.name = "SNOW_SPHERE"
     globeGlass.receiveShadow = false
     snowglobe.glowObjs.push(globeGlass)
