@@ -11,6 +11,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
 import { generateGlobeAndGround } from './Objects/GlobeSetup';
+import { genTree, genStar, plotSnow } from './Objects/TreeSnow';
 
 const snowglobe = {
   gui: undefined,
@@ -120,6 +121,122 @@ generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 setupMasterRendering(snowglobe.scene, camera, snowglobe.renderer)
 
+// Adding the tree
+snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
+//genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin)
+snowglobe.scene.add(genTree(snowglobe, 1, 14, 2.5, 0, 0, 1));
+
+function getRand() {
+  // Generate a random angle in radians
+  var randomAngle = Math.random() * 2 * Math.PI;
+
+  // Generate a random radius between 3 and 5
+  var randomRadius = Math.random() * (4.8 - 3.0) + 3.0;
+
+  // Calculate x and z coordinates based on polar to Cartesian conversion
+  var x = randomRadius * Math.cos(randomAngle);
+  var z = randomRadius * Math.sin(randomAngle);
+
+  // Return the random coordinates as an object
+  return { x: x, z: z };
+}
+
+const NUM_TREES = 40;
+
+for (let i = 0.0; i < NUM_TREES; i++) {
+  var tmp = getRand();
+  if (i/NUM_TREES > 0.80) {
+    var tree = genTree(snowglobe, 2, 14, tmp.x, 0, tmp.z, 0.8);
+    var newPosition = new THREE.Vector3(0, -1, 0);
+    tree.position.copy(newPosition);
+  }
+  else if (i/NUM_TREES > 0.4) {
+    var tree = genTree(snowglobe, 3, 14, tmp.x, 0, tmp.z, 1.2);
+    var newPosition = new THREE.Vector3(0, -1.5, 0);
+    tree.position.copy(newPosition);
+  }
+  else {
+    var tree = genTree(snowglobe, 5, 14, tmp.x, 0, tmp.z, 0.8);
+    var newPosition = new THREE.Vector3(0, -1.5, 0);
+    tree.position.copy(newPosition);
+  }
+  snowglobe.scene.add(tree);
+}
+
+const starGeometry = genStar(5, 10); // Function to create star geometry
+const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+const star = new THREE.Mesh(starGeometry, starMaterial);
+star.scale.set(0.03, 0.03, 0.03);
+star.rotation.z += 0.3;
+
+// For pivoting around the right point
+var pivotPoint = new THREE.Vector3(2.5, 0.1, -0.05);
+var pivotContainer = new THREE.Object3D();
+pivotContainer.add(star);
+pivotContainer.position.copy(pivotPoint);
+snowglobe.scene.add(pivotContainer);
+
+// Adding multiple other trees
+
+
+// ADDING SNOW
+var snow = new THREE.Group();
+var snow1 = new THREE.Path();
+plotSnow(snow1);
+
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+function randi(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+var points = snow1.getPoints();
+var velocities = [];
+var rotationalVelocities = [];
+
+function reSnow(idx) {
+  var n = Math.acos(-1+(2 * idx )/ 200)
+        , t = Math.sqrt(200 * Math.PI) * n;
+  mesh = snow.children[idx];
+  mesh.position.x = (150 * Math.sin( n) * Math.cos( t))/40;
+  mesh.position.y=(Math.random()*(150-(-150))-150)/60 + 3;
+  mesh.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/40;
+}
+
+const SNOW_COUNT = 400;
+for (var i=0;i<SNOW_COUNT;i++){
+  var geometry = new THREE.BufferGeometry().setFromPoints(points);
+  var material = new THREE.LineBasicMaterial( { color: 0xffffff ,side: THREE.DoubleSide } );
+  var mesh = new THREE.Line( geometry, material ) ;
+  var lineObject = new THREE.Object3D();
+  lineObject.add(mesh);
+  lineObject.scale.set(0.05,0.05,0.05);
+  var n = Math.acos(-1+(2 * i )/ 200)
+        , t = Math.sqrt(200 * Math.PI) * n;
+  lineObject.position.x = (150 * Math.sin( n) * Math.cos( t))/30;
+  lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
+  lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
+
+  const velocity = new THREE.Vector3(rand(-2,2),rand(-1,-3),0);
+  velocities.push(velocity);
+  const rot = randi(0,3);
+  var rotationalVelocity;
+  if(rot === 0) rotationalVelocity
+      = new THREE.Vector3(rand(-30,30),0,0)
+  if(rot === 1) rotationalVelocity
+      = new THREE.Vector3(0,rand(-30,30),0)
+  if(rot === 2) rotationalVelocity
+      = new THREE.Vector3(0,0,rand(-30,30))
+  rotationalVelocities.push(rotationalVelocity);
+  snow.add(lineObject);
+}
+snowglobe.scene.add(snow);
+
+//
+
+
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
@@ -139,7 +256,7 @@ function animate() {
   cameraPan.update()
 
   if (clock.getElapsedTime() - genTime > 2) {
-    generateSnowParticles(snowglobe.scene)
+    //generateSnowParticles(snowglobe.scene)
     genTime = clock.getElapsedTime()
   }
   for (var i = 0, n = blobs.length; i < n; i++) {
@@ -152,8 +269,31 @@ function animate() {
     blob.rotation.z = 0.06 * Math.asin(foid.velocity.y / foid.velocity.length());
   }
 
-  moveSnowParticles(snowglobe.scene)
-  moveLights(camera, clock)
+  //moveSnowParticles(snowglobe.scene);
+  // new particle movement
+  for (var i = 0; i < snow.children.length; i++) {
+    if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
+      + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
+    else {
+      var v = velocities[i];
+      var rv = rotationalVelocities[i];
+      snow.children[i].position.x += v.x/200;
+      snow.children[i].position.y += v.y/200;
+      snow.children[i].position.z += v.z/200;
+      
+      snow.children[i].rotation.x += rv.x / 2000;
+      snow.children[i].rotation.y += rv.y / 2000;
+      snow.children[i].rotation.z += rv.z / 2000;
+    }
+  }
+
+  /// dynamics
+  moveLights(camera, clock);
+  pivotContainer.rotation.z += 0.01;
+  const time = Date.now() * 0.001;
+  const flashSpeed = 0.5;
+  const intensity = Math.abs(Math.sin(time * flashSpeed));
+  starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
 
   // This function call abstracts away post-processing steps
   masterRender(snowglobe.scene)
@@ -173,5 +313,6 @@ function animate() {
 
   updateLighting(snowglobe)
   stats.update()
+
 }
 animate();

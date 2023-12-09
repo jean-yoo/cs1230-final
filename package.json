@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@tweenjs/tween.js": "^21.0.0",
+    "gsap": "^3.12.3",
     "three": "^0.158.0"
   },
   "devDependencies": {
