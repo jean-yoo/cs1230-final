@@ -5,7 +5,7 @@ let parameters = {
     Parameter1: true, 
     Parameter2: 2, 
     Parameter3: 3.1415, 
-    timeOfDay: 12, 
+    timeOfDay: 18.432, 
     dirLightIntensity: 0.6,
     zoom: 0.25 }
 

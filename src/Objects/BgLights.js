@@ -4,7 +4,7 @@ import * as THREE from 'three'
 
 const RADIUS = 8
 const COL_PARTITIONS = 8
-const LIGHTS_PER_COL = 8
+const LIGHTS_PER_COL = 7
 const Y_MIN = -3
 const Y_MAX = 10
 let circObjs = []
@@ -48,5 +48,21 @@ export function moveLights(camera, clock) {
         const newZTheta = circObj.zTheta + THREE.MathUtils.randFloat(0, THETA_MOVE_SPEED)
         circle.position.z = RADIUS * Math.sin(newZTheta)
         circObj.zTheta = newZTheta
+        circObj.mesh.opacity *= 0
+        //console.log(camera.position.distanceTo(circle.position))
+        if (Math.abs(camera.position.distanceTo(circle.position)) * 0.1 < 0.8) {
+            circle.layers.disable(1)
+            if (Math.abs(camera.position.distanceTo(circle.position)) * 0.1 < 0.6) {
+            circObj.mesh.visible = false
+            } else {
+            circle.opacity *= camera.position.distanceTo(circle.position) * 0.001
+            }
+        } else {
+            if (!(circle.layers.isEnabled(1))) {
+                circObj.mesh.visible = true
+                circle.opacity = THREE.MathUtils.randFloat(0.04, 0.7)
+                circle.layers.enable(1)
+            }
+        }
     }
 }

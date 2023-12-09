@@ -6,49 +6,27 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import {OutlinePass} from 'three/examples/jsm/postprocessing/OutlinePass' 
 import { vertexShader } from './Shaders/vertex';
-import { combineFragShader } from './Shaders/combine';
-import { edgeFragShader } from './Shaders/sobel'
+import { fragmentShader } from './Shaders/frag';
 import { BG_COLOR } from './Config/Config'
 
 const BLOOM_SCENE = 1;
-const EDGE_SCENE = 2;
-
 const BLOOM_STRENGTH = 0.6
 const BLOOM_RADIUS = 0.4
 const BLOOM_THRESHOLD = 0.0
 
 export const BLOOM_LAYER = new THREE.Layers();
 BLOOM_LAYER.set(BLOOM_SCENE);
-export const EDGE_LAYER = new THREE.Layers();
-EDGE_LAYER.set(EDGE_SCENE);
 const DARK_MATERIAL = new THREE.MeshBasicMaterial({ color: 'black' });
 const TRANSPARENT_MATERIAL = new THREE.MeshBasicMaterial({transparent:true, opacity:0})
 let materials = {}
-let lightIntensities = {}
 
-let bloomComposer
-let combineComposer
-let edgeComposer
-let baseComposer
-/*
-    1) bloomComposer draws everything on the "bloom" layer to an offscreen texture
-    2) combineComposerdraws everything in the scene and combine it with the offscreen b
-*/
-const edgePass = new ShaderPass(
-    new THREE.ShaderMaterial({
-        uniforms: {
-            base: { value: null },
-            W: { value: window.innerWidth },
-            H: { value: window.innerHeight }
-        },
-        vertexShader: vertexShader,
-        fragmentShader: edgeFragShader
-    }), "base")
-export function setupMasterRendering(scene, camera, renderer) {
+let bloomComposer;
+let combineComposer;
+export function setupBloomRendering(scene, camera, renderer) {
     bloomComposer = new EffectComposer(renderer)
     const renderPass = new RenderPass(scene, camera)
     const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        new THREE.Vector2(window.innverWidth, window.innerHeight),
         BLOOM_STRENGTH,
         BLOOM_RADIUS,
         BLOOM_THRESHOLD)
@@ -74,8 +52,8 @@ export function setupMasterRendering(scene, camera, renderer) {
                 baseTexture: { value: baseComposer.renderTarget2.texture }
             },
             vertexShader: vertexShader,
-            fragmentShader: combineFragShader
-        }))
+            fragmentShader: fragmentShader
+        }), "baseTexture")
     const outputPass = new OutputPass()
     const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera)
     combineComposer.addPass(combinePass)
@@ -97,8 +75,6 @@ function restoreObj(obj) {
     if (obj.name === "SnowParticle") { obj.visible=true }
     if (obj.isMesh && materials[obj.uuid]) {
         obj.material = materials[obj.uuid]
-    } else if ((obj.isPointLight || obj.isDirectionalLight) && lightIntensities[obj.uuid]) {
-        obj.intensity = lightIntensities[obj.uuid]
     }
 }
 
@@ -117,7 +93,6 @@ export function masterRender(scene) {
 
     // Darken all non-bloom objects
     scene.traverse(eraseNonBloomObj)
-    const bgColorTemp = scene.background
     scene.background = BG_COLOR.BLOOM_ON
     bloomComposer.render() // render them
     scene.traverse(restoreObj)
@@ -127,7 +102,7 @@ export function masterRender(scene) {
     edgeComposer.render()
 
     // restore everything 
-    scene.traverse(restoreObj)
-    scene.background = bgColorTemp
+    scene.traverse(restoreNonBloomObj)
+    scene.background = BG_COLOR.BLOOM_OFF
     combineComposer.render() // render bloom on top of the original
 }
