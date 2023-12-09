@@ -71,7 +71,7 @@ function loadAssetHelper(path, objName) {
 
 
 let collisionBoxes = []
-const OUTLINE_THICKNESS = 0.08
+const OUTLINE_THICKNESS = 0.06
 // const outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })
 const outlineMaterial = new THREE.ShaderMaterial({
     uniforms: {
@@ -87,7 +87,10 @@ export function addOutline(scene, obj) {
     const outlineClone = obj.clone()
     if (obj.material)
         obj.material = outlineMaterial
-    for (const child of outlineClone.children) { child.material = outlineMaterial }
+    for (const child of outlineClone.children) { 
+        if (child.name.includes("roof")) continue
+        child.material = outlineMaterial 
+    }
     scene.add(outlineClone)
     return outlineClone
 }
@@ -201,6 +204,8 @@ export function spawnProps(snowglobe) {
     const base = spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true, false)//.rotation.x = -Math.PI;
     if (base) {
         base.rotation.x = -Math.PI
+        console.log(base)
+        base.children[0].layers.toggle(2)
         addOutline(snowglobe.scene, base)
     }
     // console.log(snowglobe)
@@ -240,7 +245,7 @@ export function spawnProps(snowglobe) {
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
                     snowmanCount += 1
-                    addOutline(snowglobe.scene, snowman)
+                    // addOutline(snowglobe.scene, snowman)
                 }
             } else if (Math.random() > 0.9) {
                 const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
@@ -254,13 +259,13 @@ export function spawnProps(snowglobe) {
                     pointLight.intensity = 0
                     snowglobe.scene.add(pointLight)
                     snowglobe.glowObjs.push(pointLight)
-                    addOutline(snowglobe.scene, lamp)
+                    // addOutline(snowglobe.scene, lamp)
                 }
             } else if ((Math.random() > 0.7)) {
                 const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
                 if (present) {
                     present.rotation.y = Math.random() * 2 * Math.PI
-                    addOutline(snowglobe.scene, present)
+                    // addOutline(snowglobe.scene, present)
                 }
             }
     }

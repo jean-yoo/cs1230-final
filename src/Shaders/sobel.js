@@ -21,10 +21,10 @@ void main() {
         }
     }
     float mag = sqrt(Gx*Gx + Gy*Gy);
-    if (mag > 0.1) {
-        gl_FragColor = vec4(vec3(0.3), 1.0);
+    if (mag > 0.05) {
+        gl_FragColor = vec4(vec3(1.0), 1.0);
     } else {
-        gl_FragColor = texture2D(base, uvCoords);
+        gl_FragColor = vec4(vec3(0.0), 1.0);
     }
 }
 `

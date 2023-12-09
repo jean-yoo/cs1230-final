@@ -39,6 +39,8 @@ export function generateGlobeAndGround(snowglobe) {
     groundSide.castShadow = true;
     snowglobe.scene.add(groundCap)
     snowglobe.scene.add(groundSide);
+    // groundCap.layers.toggle(2)
+    groundSide.layers.toggle(2)
 
     // Perlin snow
     const perlinSnow = CircularPerlinMesh(10.5, 30)

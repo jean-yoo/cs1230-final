@@ -4,6 +4,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
+import {OutlinePass} from 'three/examples/jsm/postprocessing/OutlinePass' 
 import { vertexShader } from './Shaders/vertex';
 import { combineFragShader } from './Shaders/combine';
 import { edgeFragShader } from './Shaders/sobel'
@@ -56,7 +57,6 @@ export function setupMasterRendering(scene, camera, renderer) {
     bloomComposer.renderToScreen = false;
 
     edgeComposer = new EffectComposer(renderer)
-
     edgeComposer.addPass(renderPass)
     edgeComposer.addPass(edgePass)
     edgeComposer.renderToScreen = false
@@ -70,15 +70,17 @@ export function setupMasterRendering(scene, camera, renderer) {
         new THREE.ShaderMaterial({
             uniforms: {
                 bloomTexture: { value: bloomComposer.renderTarget2.texture },
-                // edgeTexture: { value: edgeComposer.renderTarget2.texture },
+                edgeTexture: { value: edgeComposer.renderTarget2.texture },
                 baseTexture: { value: baseComposer.renderTarget2.texture }
             },
             vertexShader: vertexShader,
             fragmentShader: combineFragShader
         }))
     const outputPass = new OutputPass()
+    const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera)
     combineComposer.addPass(combinePass)
-    combineComposer.addPass(edgePass)
+    // combineComposer.addPass(edgePass)
+    // combineComposer.addPass(outlinePass)
     combineComposer.addPass(outputPass)
 }
 
@@ -91,6 +93,8 @@ function eraseNonBloomObj(obj) {
 }
 
 function restoreObj(obj) {
+    
+    if (obj.name === "SnowParticle") { obj.visible=true }
     if (obj.isMesh && materials[obj.uuid]) {
         obj.material = materials[obj.uuid]
     } else if ((obj.isPointLight || obj.isDirectionalLight) && lightIntensities[obj.uuid]) {
@@ -100,8 +104,8 @@ function restoreObj(obj) {
 
 function eraseNonEdgeObj(obj) {
     materials[obj.uuid] = obj.material
-    if (obj.name === "SnowParticle") { obj.material = DARK_MATERIAL }
-    if (obj.isMesh && !EDGE_LAYER.test(obj.layers)) { obj.material = TRANSPARENT_MATERIAL }
+    if (obj.name === "SnowParticle") { obj.visible = false }
+    if (obj.isMesh && !EDGE_LAYER.test(obj.layers)) { obj.material = DARK_MATERIAL }
     else if (obj.isPointLight || obj.isDirectionalLight) {
         lightIntensities[obj.uuid] = obj.intensity
         obj.intensity = 0
@@ -119,8 +123,8 @@ export function masterRender(scene) {
     scene.traverse(restoreObj)
 
     // edgePass.uniforms.c = {value : 0.1}
-    // scene.traverse(eraseNonEdgeObj)
-    // edgeComposer.render()
+    scene.traverse(eraseNonEdgeObj)
+    edgeComposer.render()
 
     // restore everything 
     scene.traverse(restoreObj)
