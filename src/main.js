@@ -4,7 +4,7 @@ import { setupLights, updateLighting } from './Objects/Lights';
 import { genBgLights, moveLights } from './Objects/BgLights';
 import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { bloomRender, BLOOM_LAYER, setupBloomRendering } from './Rendering';
+import { masterRender, BLOOM_LAYER, setupBloomRendering } from './Rendering';
 import { BG_COLOR } from './Config/Config';
 import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
@@ -276,7 +276,7 @@ function animate() {
   starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
 
   // This function call abstracts away post-processing steps
-  bloomRender(snowglobe.scene)
+  masterRender(snowglobe.scene)
 
   // Turn the lights off at night
   if (isNight() && globeBloom == GLOBE_BLOOM.off) {

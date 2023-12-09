@@ -34,31 +34,19 @@ export function setupBloomRendering(scene, camera, renderer) {
     bloomComposer.addPass(bloomPass)
     bloomComposer.renderToScreen = false;
 
-    edgeComposer = new EffectComposer(renderer)
-    edgeComposer.addPass(renderPass)
-    edgeComposer.addPass(edgePass)
-    edgeComposer.renderToScreen = false
-
-    baseComposer = new EffectComposer(renderer)
-    baseComposer.addPass(renderPass)
-    baseComposer.renderToScreen = false;
-
     combineComposer = new EffectComposer(renderer)
     const combinePass = new ShaderPass(
         new THREE.ShaderMaterial({
             uniforms: {
-                bloomTexture: { value: bloomComposer.renderTarget2.texture },
-                edgeTexture: { value: edgeComposer.renderTarget2.texture },
-                baseTexture: { value: baseComposer.renderTarget2.texture }
+                baseTexture: { value: null },
+                bloomTexture: { value: bloomComposer.renderTarget2.texture }
             },
             vertexShader: vertexShader,
             fragmentShader: fragmentShader
         }), "baseTexture")
     const outputPass = new OutputPass()
-    const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera)
+    combineComposer.addPass(renderPass)
     combineComposer.addPass(combinePass)
-    // combineComposer.addPass(edgePass)
-    // combineComposer.addPass(outlinePass)
     combineComposer.addPass(outputPass)
 }
 
@@ -70,36 +58,18 @@ function eraseNonBloomObj(obj) {
     }
 }
 
-function restoreObj(obj) {
-    
-    if (obj.name === "SnowParticle") { obj.visible=true }
-    if (obj.isMesh && materials[obj.uuid]) {
+function restoreNonBloomObj(obj) {
+    if (materials[obj.uuid]) {
         obj.material = materials[obj.uuid]
     }
 }
 
-function eraseNonEdgeObj(obj) {
-    materials[obj.uuid] = obj.material
-    if (obj.name === "SnowParticle") { obj.visible = false }
-    if (obj.isMesh && !EDGE_LAYER.test(obj.layers)) { obj.material = DARK_MATERIAL }
-    else if (obj.isPointLight || obj.isDirectionalLight) {
-        lightIntensities[obj.uuid] = obj.intensity
-        obj.intensity = 0
-    }
-}
-
-export function masterRender(scene) {
-    baseComposer.render() // Memorize the "base" scene, without bloom or edge
+export function bloomRender(scene) {
 
     // Darken all non-bloom objects
     scene.traverse(eraseNonBloomObj)
     scene.background = BG_COLOR.BLOOM_ON
     bloomComposer.render() // render them
-    scene.traverse(restoreObj)
-
-    // edgePass.uniforms.c = {value : 0.1}
-    scene.traverse(eraseNonEdgeObj)
-    edgeComposer.render()
 
     // restore everything 
     scene.traverse(restoreNonBloomObj)
