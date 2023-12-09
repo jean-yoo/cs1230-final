@@ -4,7 +4,7 @@ import { setupLights, updateLighting } from './Objects/Lights';
 import { genBgLights, moveLights } from './Objects/BgLights';
 import { generateSnowParticles, moveSnowParticles } from './Objects/SnowParticles'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { masterRender, BLOOM_LAYER, setupBloomRendering } from './Rendering';
+import { bloomRender, BLOOM_LAYER, setupBloomRendering } from './Rendering';
 import { BG_COLOR } from './Config/Config';
 import { loadAsset, spawnProps } from './GenerateProps';
 import Stats from 'three/examples/jsm/libs/stats.module'
@@ -134,7 +134,7 @@ snowglobe.params.timeOfDay = 18.431
 /*
 Tree and Snow
 */
-snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
+// snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
 const NUM_TREES = 40;
 const SNOW_COUNT = 400;
 
@@ -207,7 +207,7 @@ for (var i=0;i<SNOW_COUNT;i++){
   lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
   lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
 
-  const velocity = new THREE.Vector3(rand(-2,2),rand(-1,-3),0);
+  const velocity = new THREE.Vector3(rand(-2,2),rand(-0.1, -1),0);
   velocities.push(velocity);
   const rot = randi(0,3);
   var rotationalVelocity;
@@ -276,7 +276,7 @@ function animate() {
   starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
 
   // This function call abstracts away post-processing steps
-  masterRender(snowglobe.scene)
+  bloomRender(snowglobe.scene)
 
   // Turn the lights off at night
   if (isNight() && globeBloom == GLOBE_BLOOM.off) {
@@ -288,10 +288,10 @@ function animate() {
   }
 
   //auto-run
-  snowglobe.params.timeOfDay += 0.02;
+  // snowglobe.params.timeOfDay += 0.02;
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
-  if (isNight()) snowglobe.scene.fog.density += 0.0003;
-  else snowglobe.scene.fog.density -= 0.0003;
+  // if (isNight()) snowglobe.scene.fog.density += 0.0003;
+  // else snowglobe.scene.fog.density -= 0.0003;
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
 
   updateLighting(snowglobe)
