@@ -12,7 +12,8 @@ import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
 import { generateGlobeAndGround } from './Objects/GlobeSetup';
 import { OutlineEffect } from '../OutlineEffect';
-import { genTree, genStar, plotSnow, getRand, rand, randi } from './Objects/TreeSnow';
+import { plotSnow } from './Objects/TreeSnow';
+import { getRand, rand, randi, genTree, genStar } from './GenerateProps';
 let effect;  
 
 const snowglobe = {
