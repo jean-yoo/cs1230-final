@@ -51,14 +51,12 @@ export function setupLights(scene, snowglobe) {
     
 
     const pointLight1 = new THREE.PointLight(0xffffff, 1, 100);
-    pointLight1.position.set(0,1,0);
+    pointLight1.position.set(0,0,1);
     scene.add(pointLight1);
 
-    // const pointLight2 = new THREE.PointLight(0xffffff, 1, 100);
-    // pointLight2.position.set(0,-3,0);
-    // scene.add(pointLight2);
+ 
 
-    const ambient = new THREE.AmbientLight(0x404040, 0.5); // soft white light
+    const ambient = new THREE.AmbientLight(0x404040, 1); // soft white light
     scene.add(ambient)
 }
 let prevTimeOfDay = 0

@@ -20,7 +20,8 @@ const BLOCKTYPE = {
     HOUSE_SMALL: 4,
     SNOWMAN_DERPY: 1,
     BASE: 0,
-    PRESENTS: 5
+    PRESENTS: 5,
+    DOG: 0
 }
 
 const BOUNDING_RADIUS = {
@@ -29,7 +30,8 @@ const BOUNDING_RADIUS = {
     CHURCH: 3,
     SNOWMAN_DERPY: 1,
     BASE: 0,
-    PRESENTS: 0.5
+    PRESENTS: 0.5,
+    DOG: 0
 }
 
 function getIdx(i, j, k) {
@@ -130,6 +132,7 @@ export async function loadAsset() {
     await loadAssetHelper('../assets/lamp.gltf', "LAMP")
     await loadAssetHelper('../assets/base.gltf', "BASE")
     await loadAssetHelper('../assets/presents.gltf', "PRESENTS")
+    await loadAssetHelper('../assets/dog.gltf', "DOG")
 
     const threeTone = new THREE.TextureLoader().load('../assets/ToonShadingGradientMaps/threeTone.jpg')
     threeTone.minFilter = THREE.NearestFilter
@@ -188,7 +191,7 @@ export function checkCollision(pos, br) {
 }
 
 let churchSpawned = false
-const MAX_SNOWMAN_COUNT = 6
+const MAX_SNOWMAN_COUNT = 3
 let snowmanCount = 0
 export function spawnProps(snowglobe) {
     // console.log(OBJ_DICT)
@@ -226,7 +229,7 @@ export function spawnProps(snowglobe) {
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.85) {
                 const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
                 if (houseSmall) {
                     houseSmall.rotation.y = Math.random() * 2 * Math.PI
@@ -238,7 +241,7 @@ export function spawnProps(snowglobe) {
                     }
                     // addOutline(snowglobe.scene, houseSmall)
                 }
-            } else if (Math.random() > 0.85 && snowmanCount <= MAX_SNOWMAN_COUNT) {
+            } else if (Math.random() > 0.75 && snowmanCount <= MAX_SNOWMAN_COUNT) {
                 const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
@@ -259,7 +262,7 @@ export function spawnProps(snowglobe) {
                     snowglobe.glowObjs.push(pointLight)
                     // addOutline(snowglobe.scene, lamp)
                 }
-            } else if ((Math.random() > 0.7)) {
+            } else if ((Math.random() > 0.8)) {
                 const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
                 if (present) {
                     present.rotation.y = Math.random() * 2 * Math.PI
@@ -267,4 +270,5 @@ export function spawnProps(snowglobe) {
                 }
             }
     }
+    return OBJ_DICT["DOG"]
 }
