@@ -229,7 +229,7 @@ export function spawnProps(snowglobe) {
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
-            if (Math.random() > 0.85) {
+            if (Math.random() > 0.9) {
                 const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
                 if (houseSmall) {
                     houseSmall.rotation.y = Math.random() * 2 * Math.PI
@@ -241,7 +241,7 @@ export function spawnProps(snowglobe) {
                     }
                     // addOutline(snowglobe.scene, houseSmall)
                 }
-            } else if (Math.random() > 0.75 && snowmanCount <= MAX_SNOWMAN_COUNT) {
+            } else if (Math.random() > 0.8 && snowmanCount <= MAX_SNOWMAN_COUNT) {
                 const snowman = spawnBlock(snowglobe.scene, OBJ_DICT["SNOWMAN_DERPY"], [i, 0, k], BOUNDING_RADIUS["SNOWMAN_DERPY"])
                 if (snowman) {
                     snowman.rotation.y = Math.random() * 2 * Math.PI
@@ -262,7 +262,7 @@ export function spawnProps(snowglobe) {
                     snowglobe.glowObjs.push(pointLight)
                     // addOutline(snowglobe.scene, lamp)
                 }
-            } else if ((Math.random() > 0.8)) {
+            } else if ((Math.random() > 0.9)) {
                 const present = spawnBlock(snowglobe.scene, OBJ_DICT["PRESENTS"], [i, 0, k], BOUNDING_RADIUS["PRESENTS"])
                 if (present) {
                     present.rotation.y = Math.random() * 2 * Math.PI

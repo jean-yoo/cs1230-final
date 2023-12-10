@@ -97,7 +97,7 @@ function spawnBoids(dog) {
       //foid.position.x = THREE.MathUtils.randFloat(-5, 5); foid.position.y = -1.8; foid.position.z = THREE.MathUtils.randFloat(-4.5, 5);
       // console.log("dasfjs")
       if (count >= 0 && count < 4) {
-        foid.position.x = THREE.MathUtils.randFloat(-5,-1.0); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
+        foid.position.x = THREE.MathUtils.randFloat(-1, -1.0); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
         } else if ((count >= 4) && (count < 8)) {
           foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(2.0,4.5);
         } else {

@@ -29,7 +29,7 @@ export default class Particle {
 			this.separation(particles).multiplyScalar(2.2),)
 		} else {
 			forces.push(
-				this.seek(new THREE.Vector3(-5, 0, -2)).multiplyScalar(22),		
+				this.seek(new THREE.Vector3(5, 0, 5)).multiplyScalar(22),		
 				this.alignment(particles).multiplyScalar(0.01),
 				this.cohesion(particles).multiplyScalar(20),
 				this.separation(particles).multiplyScalar(2.2),
@@ -61,7 +61,7 @@ export default class Particle {
 	  this.direction = this.velocity.clone();
 	  this.direction.normalize();
 	  const frameVelocity = this.velocity.clone()
-	  frameVelocity.multiplyScalar(0.7)
+	  frameVelocity.multiplyScalar(0.8)
 	  this.position.add(frameVelocity);
 	};
 
