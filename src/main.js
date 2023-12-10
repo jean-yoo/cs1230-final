@@ -144,7 +144,7 @@ snowglobe.params.timeOfDay = 18.431
 Tree and Snow
 */
 // snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
-const NUM_TREES = 10;
+const NUM_TREES = 20;
 const SNOW_COUNT = 400;
 
 // MAIN TREE w/ STAR
@@ -187,51 +187,51 @@ for (let i = 0.0; i < NUM_TREES; i++) {
 
 
 // ADDING SNOW
-// var snow = new THREE.Group();
-// var snowPath = new THREE.Path();
-// plotSnow(snowPath);
+var snow = new THREE.Group();
+var snowPath = new THREE.Path();
+plotSnow(snowPath);
 
-// var points = snowPath.getPoints();
-// var velocities = [];
-// var rotationalVelocities = [];
+var points = snowPath.getPoints();
+var velocities = [];
+var rotationalVelocities = [];
 
-// function reSnow(idx) {
-//   var n = Math.acos(-1+(2 * idx )/ 200)
-//         , t = Math.sqrt(200 * Math.PI) * n;
-//   mesh = snow.children[idx];
-//   mesh.position.x = (150 * Math.sin( n) * Math.cos( t))/40;
-//   mesh.position.y=(Math.random()*(150-(-150))-150)/60 + 3;
-//   mesh.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/40;
-// }
+function reSnow(idx) {
+  var n = Math.acos(-1+(2 * idx )/ 200)
+        , t = Math.sqrt(200 * Math.PI) * n;
+  mesh = snow.children[idx];
+  mesh.position.x = (150 * Math.sin( n) * Math.cos( t))/40;
+  mesh.position.y=(Math.random()*(150-(-150))-150)/60 + 3;
+  mesh.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/40;
+}
 
-// for (var i=0;i<SNOW_COUNT;i++){
-//   var geometry = new THREE.BufferGeometry().setFromPoints(points);
-//   var material = new THREE.LineBasicMaterial( { color: 0xffffff ,side: THREE.DoubleSide } );
-//   var mesh = new THREE.Line(geometry, material );
-//   var lineObject = new THREE.Object3D();
-//   lineObject.add(mesh);
-//   lineObject.scale.set(0.05,0.05,0.05);
-//   var n = Math.acos(-1+(2 * i )/ 200), t = Math.sqrt(200 * Math.PI) * n;
-//   lineObject.position.x = (150 * Math.sin( n) * Math.cos( t))/30;
-//   lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
-//   lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
+var geometry = new THREE.BufferGeometry().setFromPoints(points);
+var material = new THREE.LineBasicMaterial( { color: 0xffffff ,side: THREE.DoubleSide } );
+for (var i=0;i<SNOW_COUNT;i++) {
+  var mesh = new THREE.Line(geometry, material);
+  var lineObject = new THREE.Object3D();
+  lineObject.add(mesh);
+  lineObject.scale.set(0.05,0.05,0.05);
+  var n = Math.acos(-1+(2 * i )/ 200), t = Math.sqrt(200 * Math.PI) * n;
+  lineObject.position.x = (150 * Math.sin( n) * Math.cos( t))/30;
+  lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
+  lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
 
-//   const velocity = new THREE.Vector3(rand(-2,2),rand(-0.1, -1),0);
-//   velocities.push(velocity);
-//   const rot = randi(0,3);
-//   var rotationalVelocity;
-//   if(rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
-//   if(rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
-//   if(rot === 2) rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
-//   rotationalVelocities.push(rotationalVelocity);
-//   snow.add(lineObject);
-// }
-// snowglobe.scene.add(snow);
+  const velocity = new THREE.Vector3(rand(-2,2),rand(-0.1, -1),0);
+  velocities.push(velocity);
+  const rot = randi(0,3);
+  var rotationalVelocity;
+  if(rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
+  if(rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
+  if(rot === 2) rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
+  rotationalVelocities.push(rotationalVelocity);
+  snow.add(lineObject);
+}
+snowglobe.scene.add(snow);
 
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
-generateSnowParticles(snowglobe.scene)
+//generateSnowParticles(snowglobe.scene)
 
 const GLOBE_BLOOM = { off: 0, on: 1 }
 let globeBloom = GLOBE_BLOOM.off
@@ -283,23 +283,23 @@ function animate() {
     blob.rotateY(Math.PI)
   }
 
-  moveSnowParticles(snowglobe.scene)
+  //moveSnowParticles(snowglobe.scene)
   // new particle movement
-  // for (var i = 0; i < snow.children.length; i++) {
-  //   if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
-  //     + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
-  //   else {
-  //     var v = velocities[i];
-  //     var rv = rotationalVelocities[i];
-  //     snow.children[i].position.x += v.x/200;
-  //     snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay-12)+1) / 3)*v.y/200;
-  //     snow.children[i].position.z += v.z/200;
+  for (var i = 0; i < snow.children.length; i++) {
+    if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
+      + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
+    else {
+      var v = velocities[i];
+      var rv = rotationalVelocities[i];
+      snow.children[i].position.x += v.x/200;
+      snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay-12)+1) / 2)*v.y/200;
+      snow.children[i].position.z += v.z/200;
       
-  //     snow.children[i].rotation.x += rv.x / 2000;
-  //     snow.children[i].rotation.y += rv.y / 2000;
-  //     snow.children[i].rotation.z += rv.z / 2000;
-  //   }
-  // }
+      snow.children[i].rotation.x += rv.x / 2000;
+      snow.children[i].rotation.y += rv.y / 2000;
+      snow.children[i].rotation.z += rv.z / 2000;
+    }
+  }
   moveLights(camera, clock)
   pivotContainer.rotation.z += 0.01;
   const time = Date.now() * 0.001;

@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { outlineShader } from './Shaders/outline'
+import { genTree, genStar, plotSnow, getRand, rand, randi } from './Objects/TreeSnow'
 // import { EDGE_LAYER } from './Rendering'
 
 const loader = new GLTFLoader()
