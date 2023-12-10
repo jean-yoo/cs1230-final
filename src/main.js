@@ -85,7 +85,7 @@ foids = [];
 var count = 0;
 
 function spawnBoids(dog) {
-  while (count !=10) {
+  while (count !=7) {
     // init each particle at a random position and velocity
     foid = foids[count] = new Particle();
     foid.position = new THREE.Vector3(1,1,1);
@@ -260,7 +260,7 @@ function animate() {
     // blob.rotation.x = foid.direction.x * -10000
     // blob.rotation.y =-90
     // blob.rotation.z = foid.direction.z
-    blob.lookAt(foid.direction.clone().multiplyScalar(-1000000).x, -2, 0)
+    // blob.lookAt(foid.direction.clone().multiplyScalar(-1000000).x, -2, 0)
     // const dir = new THREE.Vector3()
     // blob.getWorldDirection(dir)
     // const ler = dir.lerp(foid.direction.clone().multiplyScalar(-10000), 1)
@@ -270,11 +270,11 @@ function animate() {
     // // console.log(-1*Math.abs(dir.x), -1*Math.abs(dir.z))
     // // blob.lookAt(new THREE.Vector3(0, -2, 0))
     // // blob.rotateY(dir.x * 0.02 - dir.z * 0.01)
-    // var mat = blob.matrix 
-    // var idk = foid.direction.applyMatrix4(mat)
+    var mat = blob.matrix 
+    var idk = foid.direction.applyMatrix4(mat)
 
-    // blob.lookAt(new THREE.Vector3(-idk.x*0.1, -2 , idk.z*0.1))
-    // blob.rotateY(Math.PI + idk.x*0.1)
+    blob.lookAt(new THREE.Vector3(-idk.x*0.1, -2 , idk.z*0.1))
+    blob.rotateY(Math.PI)
   }
 
   moveSnowParticles(snowglobe.scene)

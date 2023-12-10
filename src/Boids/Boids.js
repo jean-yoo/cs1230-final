@@ -22,7 +22,7 @@ export default class Particle {
 
 	this.swim = function (particles) {
 		const forces = []
-		var collisionResult = checkCollision(this.position, 0.7)
+		var collisionResult = checkCollision(this.position, 0.5)
 		if (!(collisionResult === undefined)) {
 			forces.push(this.calculateTangent(collisionResult).multiplyScalar(50),
 			this.wander().multiplyScalar(20),
@@ -61,7 +61,7 @@ export default class Particle {
 	  this.direction = this.velocity.clone();
 	  this.direction.normalize();
 	  const frameVelocity = this.velocity.clone()
-	  frameVelocity.multiplyScalar(0.6)
+	  frameVelocity.multiplyScalar(0.7)
 	  this.position.add(frameVelocity);
 	};
 
