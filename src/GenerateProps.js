@@ -295,13 +295,10 @@ export function randi(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin) {
+export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin, treeMaterial) {
     var branchesParent = new THREE.Object3D();
 
     var x = 0, y = 0;
-    const textureLoader = new THREE.TextureLoader();
-    const treeTexture = textureLoader.load('../pineTexture.jpg');
-    const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5});
     function addBranch(count, x, y, z, opts) {
         var points2 = [];
         var l;

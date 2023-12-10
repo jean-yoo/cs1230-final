@@ -146,10 +146,13 @@ Tree and Snow
 */
 // snowglobe.scene.fog = new THREE.FogExp2(2237993,.0015);
 const NUM_TREES = 20;
-const SNOW_COUNT = 400;
+const SNOW_COUNT = 300;
 
 // MAIN TREE w/ STAR
-snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1));
+const textureLoader = new THREE.TextureLoader();
+const treeTexture = textureLoader.load('../pineTexture.jpg');
+const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5});
+snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1, treeMaterial));
 const starGeometry = genStar(5, 10); // Function to create star geometry
 const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 const star = new THREE.Mesh(starGeometry, starMaterial);
@@ -168,17 +171,17 @@ for (let i = 0.0; i < NUM_TREES; i++) {
   do {
     var tmp = getRand();
     if (i/NUM_TREES > 0.80) {
-      tree = genTree(snowglobe, 2, 14, tmp.x, 0, tmp.z, 0.8);
+      tree = genTree(snowglobe, 2, 14, tmp.x, 0, tmp.z, 0.8, treeMaterial);
       newPosition = new THREE.Vector3(0, -1, 0);
       tree.position.copy(newPosition);
     }
     else if (i/NUM_TREES > 0.4) {
-      tree = genTree(snowglobe, 3, 14, tmp.x, 0, tmp.z, 1.2);
+      tree = genTree(snowglobe, 3, 14, tmp.x, 0, tmp.z, 1.2, treeMaterial);
       newPosition = new THREE.Vector3(0, -1.5, 0);
       tree.position.copy(newPosition);
     }
     else {
-      tree = genTree(snowglobe, 5, 14, tmp.x, 0, tmp.z, 0.8);
+      tree = genTree(snowglobe, 5, 14, tmp.x, 0, tmp.z, 0.8, treeMaterial);
       newPosition = new THREE.Vector3(0, -1.5, 0);
       tree.position.copy(newPosition);
     }
