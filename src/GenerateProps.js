@@ -191,7 +191,7 @@ export function checkCollision(pos, br) {
 }
 
 let churchSpawned = false
-const MAX_SNOWMAN_COUNT = 3
+const MAX_SNOWMAN_COUNT = 2
 let snowmanCount = 0
 export function spawnProps(snowglobe) {
     // console.log(OBJ_DICT)
@@ -229,7 +229,7 @@ export function spawnProps(snowglobe) {
     for (let i = 0; i < 2 * radius + 1; i++)
         for (let k = 0; k < 2 * radius + 1; k++) {
             // const groundBlockType = grid[getIdx(i, 0, k)]
-            if (Math.random() > 0.9) {
+            if (Math.random() > 0.8) {
                 const houseSmall = spawnBlock(snowglobe.scene, OBJ_DICT["HOUSE_SMALL"], [i, 0, k], BOUNDING_RADIUS["HOUSE_SMALL"])
                 if (houseSmall) {
                     houseSmall.rotation.y = Math.random() * 2 * Math.PI
@@ -248,7 +248,7 @@ export function spawnProps(snowglobe) {
                     snowmanCount += 1
                     // addOutline(snowglobe.scene, snowman)
                 }
-            } else if (Math.random() > 0.9) {
+            } else if (Math.random() > 0.8) {
                 const lamp = spawnBlock(snowglobe.scene, OBJ_DICT["LAMP"], [i, 0, k], BOUNDING_RADIUS["LAMP"])
                 
                 if (lamp) {

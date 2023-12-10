@@ -20,7 +20,7 @@ const snowglobe = {
   // container: document.getElementById('container'),
   // canvas: document.getElementById('cityscape'),
   // screenResolution: undefined,
-  // camera: undefined,
+  autorun: false,
   scene: undefined,
   renderer: undefined,
   // cloudComposer: undefined,
@@ -88,17 +88,17 @@ function spawnBoids(dog) {
   while (count !=7) {
     // init each particle at a random position and velocity
     foid = foids[count] = new Particle();
-    foid.position = new THREE.Vector3(1,1,1);
+    foid.position = new THREE.Vector3(1,-1.85,1);
     // console.log(foid.position)
     // console.log(foid)
     // foid.position.x = 0; foid.position.y = -2; foid.position.z = 0;
     // console.log(checkCollision(foid.position, 1))
     while (!(checkCollision(foid.position, 1) === undefined)) {
-      //foid.position.x = THREE.MathUtils.randFloat(-5, 5); foid.position.y = -1.8; foid.position.z = THREE.MathUtils.randFloat(-4.5, 5);
+      //foid.position.x = 0; foid.position.y = -1.8; foid.position.z = 0;
       // console.log("dasfjs")
       if (count >= 0 && count < 4) {
         foid.position.x = THREE.MathUtils.randFloat(-1, -1.0); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(-4.5,-1.0);
-        } else if ((count >= 4) && (count < 8)) {
+        } else if ((count >= 4) && (count <8)) {
           foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(2.0,4.5);
         } else {
           foid.position.x = THREE.MathUtils.randFloat(-1, 0.9); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(1.0,1.2);
@@ -302,7 +302,7 @@ function animate() {
   starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
 
   // This function call abstracts away post-processing steps
-  bloomRender(snowglobe.scene)
+  bloomRender(snowglobe.scene, effect, camera)
 
   // Turn the lights off at night
   if (isNight() && globeBloom == GLOBE_BLOOM.off) {
@@ -314,7 +314,9 @@ function animate() {
   }
 
   //auto-run
-  // snowglobe.params.timeOfDay += 0.02;
+  if (snowglobe.params.autorun) {
+  snowglobe.params.timeOfDay += 0.02
+  }
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
   // if (isNight()) snowglobe.scene.fog.density += 0.0003;
   // else snowglobe.scene.fog.density -= 0.0003;

@@ -64,7 +64,7 @@ function restoreNonBloomObj(obj) {
     }
 }
 
-export function bloomRender(scene) {
+export function bloomRender(scene, effect, camera) {
 
     // Darken all non-bloom objects
     scene.traverse(eraseNonBloomObj)
@@ -75,4 +75,5 @@ export function bloomRender(scene) {
     scene.traverse(restoreNonBloomObj)
     scene.background = BG_COLOR.BLOOM_OFF
     combineComposer.render() // render bloom on top of the original
+    effect.render( scene, camera );
 }
