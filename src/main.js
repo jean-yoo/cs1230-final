@@ -84,8 +84,8 @@ blobs = [];
 foids = [];
 var count = 0;
 
-function spawnBoids(dog) {
-  while (count !=7) {
+function spawnBoids(dogs) {
+  while (count !=8) {
     // init each particle at a random position and velocity
     foid = foids[count] = new Particle();
     foid.position = new THREE.Vector3(1,-1.85,1);
@@ -107,8 +107,14 @@ function spawnBoids(dog) {
 
     // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
     // foid.setBoundaries(8, 8, 8);
-
-    blob = blobs[count] = dog.obj.clone()
+    var dog_prob = Math.random()
+    if (dog_prob < 0.4) {
+      blob = blobs[count] = dogs[0].obj.clone()
+    } else if ((dog_prob >= 0.4) && (dog_prob < 0.7)) {
+      blob = blobs[count] = dogs[1].obj.clone()
+    } else {
+      blob = blobs[count] = dogs[2].obj.clone()
+    }
     // new THREE.Mesh(
     //   new THREE.DodecahedronGeometry(0.3),
     //   new THREE.MeshPhongMaterial({ color: "rgb(71, 50, 36)" }));
@@ -235,8 +241,8 @@ function animate() {
   requestAnimationFrame(animate);
   if (!ASSETS_LOADED) return
   if (!propsGenerated) {
-    const dog = spawnProps(snowglobe);
-    spawnBoids(dog)
+    const dogs = spawnProps(snowglobe);
+    spawnBoids(dogs)
     propsGenerated = true;
   }
   cameraPan.update()

@@ -21,12 +21,14 @@ const BLOCKTYPE = {
     SNOWMAN_DERPY: 1,
     BASE: 0,
     PRESENTS: 5,
-    DOG: 0
+    DOG: 0,
+    SPOTTY:0,
+    THIRDDOG:0
 }
 
 const BOUNDING_RADIUS = {
     HOUSE_SMALL: 1,
-    LAMP: 0,
+    LAMP: 0.5,
     CHURCH: 3,
     SNOWMAN_DERPY: 1,
     BASE: 0,
@@ -133,6 +135,8 @@ export async function loadAsset() {
     await loadAssetHelper('../assets/base.gltf', "BASE")
     await loadAssetHelper('../assets/presents.gltf', "PRESENTS")
     await loadAssetHelper('../assets/dog.gltf', "DOG")
+    await loadAssetHelper('../assets/spotty.gltf', "SPOTTY")
+    await loadAssetHelper('../assets/thirddog.gltf', "THIRDDOG")
 
     const threeTone = new THREE.TextureLoader().load('../assets/ToonShadingGradientMaps/threeTone.jpg')
     threeTone.minFilter = THREE.NearestFilter
@@ -270,5 +274,5 @@ export function spawnProps(snowglobe) {
                 }
             }
     }
-    return OBJ_DICT["DOG"]
+    return [OBJ_DICT["DOG"], OBJ_DICT["SPOTTY"], OBJ_DICT["THIRDDOG"]]
 }

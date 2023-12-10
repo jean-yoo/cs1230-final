@@ -15,12 +15,12 @@ export function setupControlPanel(snowglobe) {
 
     gui.add(parameters, 'timeOfDay', 0, 24)
     gui.add(parameters, 'autorun')
-
     // gui.add(parameters, 'dirLightIntensity', 0, 2)
 
     // gui.add(parameters, 'zoom', 0.025, 2)
 
     snowglobe.params = parameters
+    gui.close()
     snowglobe.gui = gui
     console.log(gui)
 }
