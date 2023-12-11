@@ -6,7 +6,7 @@ import { checkCollision } from '../GenerateProps';
 export default class Particle {
     constructor() {
 	this.position = new THREE.Vector3().randomDirection();
-	this.direction = new THREE.Vector3(0,0,0);
+	this.direction = new THREE.Vector3(-1,0,0);
 	this.velocity = this.direction.clone(); 
 	this.wanderAngle = 0;
 	var _acceleration = new THREE.Vector3();
@@ -21,15 +21,20 @@ export default class Particle {
 	};
 
 	this.swim = function (particles, params) {
+		if (Math.random() < 0.5) {
+			var seekingForce = new THREE.Vector3(0, 0,-2)
+		} else {
+			var seekingForce = new THREE.Vector3(-2, 0, 0)
+		}
 		const forces = []
-		var collisionResult = checkCollision(this.position, 0.3)
+		var collisionResult = checkCollision(this.position, 0.4)
 		if (!(collisionResult === undefined)) {
 			forces.push(this.calculateTangent(collisionResult).multiplyScalar(50),
 			this.wander().multiplyScalar(20),
 			this.separation(particles).multiplyScalar(2.2),)
 		} else {
 			forces.push(
-				this.seek(new THREE.Vector3(-5, 0, 2)).multiplyScalar(20),		
+				this.seek(seekingForce).multiplyScalar(20),		
 				this.alignment(particles).multiplyScalar(0.01),
 				this.cohesion(particles).multiplyScalar(20),
 				this.separation(particles).multiplyScalar(2.2),

@@ -332,19 +332,19 @@ function animate() {
 
   updateLighting(snowglobe)
   if (spacebar_pressed) {
-    if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 6)) {
+    if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 7)) {
       save_speed = snowglobe.params.snowSpeed; 
       console.log(save_speed, "is pressed")
     }
     if (clock.getElapsedTime() < 2) {
-      snowglobe.params.snowSpeed = 6
+      snowglobe.params.snowSpeed = 7
       spacebar_waspressed = true
     }
   }
   //   }
     else {
       // console.log(clock2.getElapsedTime(), spacebar_waspressed)
-      if (spacebar_waspressed && (clock2.getElapsedTime() > 1)) {
+      if (spacebar_waspressed && (clock2.getElapsedTime() > 2)) {
         console.log(save_speed)
         // console.log("dajf")
         snowglobe.params.snowSpeed = save_speed
