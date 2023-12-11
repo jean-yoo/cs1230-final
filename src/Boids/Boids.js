@@ -20,7 +20,7 @@ export default class Particle {
 		_depth = depth;
 	};
 
-	this.swim = function (particles) {
+	this.swim = function (particles, params) {
 		const forces = []
 		var collisionResult = checkCollision(this.position, 0.3)
 		if (!(collisionResult === undefined)) {
@@ -29,7 +29,7 @@ export default class Particle {
 			this.separation(particles).multiplyScalar(2.2),)
 		} else {
 			forces.push(
-				this.seek(new THREE.Vector3(-2, 0, 2)).multiplyScalar(20),		
+				this.seek(new THREE.Vector3(-2, 0, 4)).multiplyScalar(20),		
 				this.alignment(particles).multiplyScalar(0.01),
 				this.cohesion(particles).multiplyScalar(20),
 				this.separation(particles).multiplyScalar(2.2),
@@ -61,7 +61,11 @@ export default class Particle {
 	  this.direction = this.velocity.clone();
 	  this.direction.normalize();
 	  const frameVelocity = this.velocity.clone()
-	  frameVelocity.multiplyScalar(0.8)
+	  if (params.snowSpeed >= 1) {
+		frameVelocity.multiplyScalar(0.8 * params.snowSpeed)
+	  } else {
+		frameVelocity.multiplyScalar(0.9)
+	  }
 	  this.position.add(frameVelocity);
 	};
 
@@ -76,17 +80,12 @@ export default class Particle {
         let nedge = -3.5;
         let edge = 3.5; 
         let offset = 0.01; 
-        // console.log(this.position)
+
 		if ((Math.sqrt(this.position.x * this.position.x + this.position.z * this.position.z) >= 4.9)
 		|| this.position.length() === 0)  {
 			this.velocity.multiplyScalar(-1);
-			// var axis = new THREE.Vector3( 1, 1, 1 );
-			// var angle = -Math.PI / 2;
-			// vector.applyAxisAngle( axis, angle );
 			this.position.x < 0 ? this.position.x += offset : this.position.x -= offset;
-			// this.position.x < 0 ? this.velocity.x *= -1 : this.velocity.x *= 1;
 			this.position.z < 0 ? this.position.z += offset : this.position.z -= offset;
-			// this.position.z < 0 ? this.velocity.z *= -1 : this.velocity.z *= 1;
 		}
     }
 

@@ -43,12 +43,12 @@ export function generateSnowParticles(scene) {
 
 }
 
-export function moveSnowParticles(scene) {
+export function moveSnowParticles(params) {
     //console.log(particles.geometry.attributes.velocity.array)
     for (let i = 0; i <= numSnowflakes*3; i+= 3) {
-        particles.geometry.attributes.position.array[i] -= particles.geometry.attributes.velocity.array[i]
-        particles.geometry.attributes.position.array[i+1] -= particles.geometry.attributes.velocity.array[i+1]
-        particles.geometry.attributes.position.array[i+2] -= particles.geometry.attributes.velocity.array[i+2]
+        particles.geometry.attributes.position.array[i] -= particles.geometry.attributes.velocity.array[i] * params.snowSpeed
+        particles.geometry.attributes.position.array[i+1] -= particles.geometry.attributes.velocity.array[i+1] * params.snowSpeed
+        particles.geometry.attributes.position.array[i+2] -= particles.geometry.attributes.velocity.array[i+2] * params.snowSpeed
 
     
         if (particles.geometry.attributes.position.array[i+1] < -2 || particles.geometry.attributes.position.array[i] < -4

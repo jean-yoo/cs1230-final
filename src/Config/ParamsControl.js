@@ -3,7 +3,8 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js'
 
 let parameters = { 
     timeOfDay: 18.432, 
-    autorun: false
+    autorun: false,
+    snowSpeed: 1
  }
 
 export function setupControlPanel(snowglobe) { 
@@ -15,7 +16,7 @@ export function setupControlPanel(snowglobe) {
 
     gui.add(parameters, 'timeOfDay', 0, 24)
     gui.add(parameters, 'autorun')
-    // gui.add(parameters, 'dirLightIntensity', 0, 2)
+    gui.add(parameters, 'snowSpeed', 0.5, 3)
 
     // gui.add(parameters, 'zoom', 0.025, 2)
 

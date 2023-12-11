@@ -18,18 +18,10 @@ let effect;
 
 const snowglobe = {
   gui: undefined,
-  // container: document.getElementById('container'),
-  // canvas: document.getElementById('cityscape'),
-  // screenResolution: undefined,
   autorun: false,
   scene: undefined,
   renderer: undefined,
-  // cloudComposer: undefined,
-  // bloomComposer: undefined,
-  // shaderComposer: undefined,
-  // orbitControls: undefined,
   params: undefined,
-  // stats: undefined, // Temporary
   glass: undefined,
   glowObjs: [] // Used to control blooming/lighting based on time of day
 }
@@ -259,7 +251,7 @@ function animate() {
 
   for (var i = 0, n = blobs.length; i < n; i++) {
     foid = foids[i];
-    foid.swim(foids);
+    foid.swim(foids, snowglobe.params);
     blob = blobs[i]; blob.position.copy(foids[i].position);
 
     // blob.lookAt(new THREE.Vector3(foids[i].velocity))
@@ -289,7 +281,7 @@ function animate() {
     blob.rotateY(Math.PI)
   }
 
-  moveSnowParticles(snowglobe.scene)
+  moveSnowParticles(snowglobe.params)
   // new particle movement
   // for (var i = 0; i < snow.children.length; i++) {
   //   if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
