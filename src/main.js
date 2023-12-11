@@ -224,9 +224,9 @@ for (var i=0;i<SNOW_COUNT;i++) {
   velocities.push(velocity);
   const rot = randi(0,3);
   var rotationalVelocity;
-  if(rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
-  if(rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
-  if(rot === 2) rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
+  if (rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
+  else if (rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
+  else rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
   rotationalVelocities.push(rotationalVelocity);
   snow.add(lineObject);
 }
