@@ -348,6 +348,7 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
         options.bevelSegments = randi(1, 3);
         
     }
+    // add christmas lights
     if (bigTree) {
     for (var i = 0; i < 24; i++) {
             var count = Math.floor(i/2)
@@ -365,9 +366,7 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
                 scale = 13.5 - count
             }
             sphMesh.position.set(Math.cos(angle)*0.06*scale+0.5, branchArray[count].position.y-0.1, Math.sin(angle)*scale*0.06);
-            // sphMesh.position.set(branchMesh.position.x + 40/90 + Math.random()*0.1, branchMesh.position.y, branchMesh.position.z+40/90+ Math.random()*0.1)
             branchesParent.add(sphMesh)
-            // snowglobe.glowObjs.push(lamp.children[2])
             if (Math.random() < 0.3) {
             const pointLight = new THREE.PointLight(colorString, 1.0)
             pointLight.position.set(sphMesh.position.x, sphMesh.position.y, sphMesh.position.z)

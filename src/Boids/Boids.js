@@ -88,31 +88,6 @@ export default class Particle {
 			this.position.z < 0 ? this.position.z += offset : this.position.z -= offset;
 			// this.position.z < 0 ? this.velocity.z *= -1 : this.velocity.z *= 1;
 		}
-        // if (this.position.x < nedge) {
-        //     this.position.x += offset;
-		// 	// var axis = new THREE.Vector3( 0, 1, 0 );
-		// 	// var angle = Math.PI / 2;
-		// 	// vector.applyAxisAngle( axis, angle );
-        //     vector.x *= -1; 
-        // } else if (this.position.x > edge) {
-        //     this.position.x -= offset;
-		// 	var axis = new THREE.Vector3( 0, 1, 0 );
-		// 	var angle = Math.PI / 2;
-		// 	vector.applyAxisAngle( axis, angle );
-        // }
-
-        // if (this.position.z < nedge) {
-        //     this.position.z += offset;
-		// 	var axis = new THREE.Vector3( 0, 1, 0 );
-		// 	var angle = Math.PI / 2;
-		// 	vector.applyAxisAngle( axis, angle );
-        // } else if (this.position.z > edge) {
-        //     this.position.z -= offset;
-		// 	var axis = new THREE.Vector3( 0, 1, 0 );
-		// 	var angle = Math.PI / 2;
-		// 	vector.applyAxisAngle( axis, angle );
-        // }
-        // return vector 
     }
 
 	this.wander = function() {
@@ -127,63 +102,6 @@ export default class Particle {
 		pointAhead.normalize();
 		return pointAhead
 	}
-
-	this.flock = function (particles) {
-		// this.velocity.add(this.separation(particles).multiplyScalar(50)); 
-		// this.velocity.add(this.alignment(particles).multiplyScalar(50));
-		// this.velocity.add(this.cohesion(particles).multiplyScalar(10));
-		// this.velocity.add(this.wander().multiplyScalar(200))
-		this.velocity.add(this.seek(new THREE.Vector3(0, 0, 0)).multiplyScalar(8))
-		// if (_goal)
-		// 	_acceleration.add(this.reach(_goal, 0.0002));
-
-		// _acceleration.add(this.alignment(particles));
-		// _acceleration.add(this.cohesion(particles));
-		// _acceleration.add(this.separation(particles));
-	};
-
-	// this.move = function () {
-	// 	this.velocity.add(_acceleration);
-
-	// 	// if (this.velocity.length() > _speed)
-	// 	// 	this.velocity.divideScalar(this.velocity.length() / _speed);
-
-	// 	this.position.add(this.velocity);
-	// 	_acceleration.set(0, 0, 0);
-	// };
-
-	// this.avoid = function (target) {
-	// 	var steer = new THREE.Vector3();
-
-	// 	steer.copy(this.position);
-	// 	steer.sub(target);
-	// 	steer.multiplyScalar(1 / this.position.distanceToSquared(target));
-
-	// 	return steer;
-	// };
-
-	// this.repulse = function (target) {
-	// 	var distance = this.position.distanceTo(target);
-
-	// 	if (distance < 150) {
-	// 		var steer = new THREE.Vector3();
-
-	// 		steer.subVectors(this.position, target);
-	// 		steer.multiplyScalar(0.5 / distance);
-    //         vector.setComponent(1, 0); 
-
-	// 		_acceleration.add(steer);
-	// 	}
-	// };
-
-	// this.reach = function (target, amount) {
-	// 	var steer = new THREE.Vector3();
-
-	// 	steer.subVectors(target, this.position);
-	// 	steer.multiplyScalar(amount);
-
-	// 	return steer;
-	// };
 
 	this.seek = function(dest) {
 		var direction = new THREE.Vector3(0,0,0);
@@ -202,41 +120,13 @@ export default class Particle {
 		count = 0;
 
 		for (var i = 0, n = particles.length; i < n; i++) {
-			// if (Math.random() > 0.6)
-			// 	continue;
-
 			particle = particles[i];
 			total.add(particle.direction);
 		}
 		total.normalize()
 		total.multiplyScalar(10)
 		return total; 
-
-
-
-			var distance = particle.position.distanceTo(this.position);
-			var idk = new THREE.Vector3(0,0,0).copy(particle.velocity);
-			total.add(idk.normalize());
 		}
-		// total.normalize();
-		// // total.multiplyScalar(0.00001); 
-		// return total; 
-
-		// 	if (distance > 0 && distance <= _padding) {
-		// 		total.add(particle.velocity);
-		// 		count++;
-		// 	}
-		// }
-
-		// if (count > 0) {f
-		// 	total.divideScalar(count);
-
-		// 	if (total.length() > _maneuver)
-		// 		total.divideScalar(total.length() / _maneuver);
-		// }
-
-		// return total;
-	// };
 
 	this.cohesion = function (particles) {
 		var particle, distance,
@@ -245,10 +135,6 @@ export default class Particle {
 		count = 0;
 
 		for (var i = 0, n = particles.length; i < n; i ++) {
-
-			// if (Math.random() > 0.6)
-			// 	continue;
-
 			particle = particles[i];
 			distance = particle.position.distanceTo(this.position);
 
@@ -268,38 +154,9 @@ export default class Particle {
 
 
 		return directionToAvgPosition;
-
-		// steer.subVectors(sum, this.position);
-
-		// if (steer.length() > _maneuver)
-		// 	steer.divideScalar(steer.length() / _maneuver);
-
-		// return steer;
 	};
 
 	this.separation = function (particles) {
-		// var particle, distance,
-		// sum = new THREE.Vector3(),
-		// repulse = new THREE.Vector3();
-
-		// for (var i = 0, n = particles.length; i < n; i ++) {
-		// 	// if (Math.random() > 0.6)
-		// 	// 	continue;
-
-		// 	particle = particles[i];
-		// 	distance = particle.position.distanceTo(this.position);
-		// 	// console.log(this.position)
-
-		// 	// if (distance > 0 && distance <= _padding) {
-		// 		if (distance > 0) {
-		// 			repulse.subVectors(this.position, particle.position);
-		// 			repulse.normalize();
-		// 			repulse.divideScalar(distance);
-		// 			// repulse.setComponent(1, 0); 
-		// 			sum.add(repulse);
-		// 		}
-		// 	// }
-		// }
 		var particle, distance
 		var sum = new THREE.Vector3(),
 		repulse = new THREE.Vector3();
