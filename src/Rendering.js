@@ -4,7 +4,6 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
 import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
-import {OutlinePass} from 'three/examples/jsm/postprocessing/OutlinePass' 
 import { vertexShader } from './Shaders/vertex';
 import { fragmentShader } from './Shaders/frag';
 import { BG_COLOR } from './Config/Config'
