@@ -41,7 +41,6 @@ snowglobe.scene = new THREE.Scene()
 snowglobe.scene.background = BG_COLOR.BLOOM_OFF
 
 var clock = new THREE.Clock()
-clock.start()
 
 // Setup camera
 let camera = new THREE.PerspectiveCamera(
@@ -326,9 +325,35 @@ function animate() {
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
 
   updateLighting(snowglobe)
+  // console.log(clock2.getElapsedTime())
+
+  // console.log( snowglobe.gui)
+  if (spacebar_pressed) {
+    if (clock.elapsedTime < 0.01) {
+    save_speed = snowglobe.params.snowSpeed; 
+    }
+    // console.log("here", save_speed)
+    if (clock.getElapsedTime() < 2) {
+      snowglobe.params.snowSpeed = 5
+      spacebar_waspressed = true
+    }
+  }
+  //   }
+    else {
+      console.log(clock2.getElapsedTime(), spacebar_waspressed)
+      if (spacebar_waspressed && (clock2.getElapsedTime() > 1)) {
+        console.log("dajf")
+        snowglobe.params.snowSpeed = 1
+        clock2.stop()
+        spacebar_waspressed = false; 
+      }
+    }
+
+
   stats.update()
 }
 animate();
+var save_speed; 
 
 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -357,3 +382,34 @@ audioLoader.load('../song.mp3', function( buffer ) {
     sound.setVolume(0.2);
     sound.play();
 });
+
+var spacebar_pressed = false;
+var spacebar_waspressed = false; 
+document.addEventListener("keydown", function(event)
+{
+  if (event.keyCode == 32) {
+    spacebar_pressed = true;
+    clock.start()
+}; 
+});
+
+var clock2 = new THREE.Clock()
+document.addEventListener("keyup", function(event)
+{
+  if (event.keyCode == 32) {
+    console.log(event.keyCode)
+    spacebar_pressed = false;
+    clock.stop()
+    clock2.start()
+}; 
+});
+// window.onkeydown = function(event) {
+//     if (event.keyCode == 32) {
+//         spacebar_pressed = true;
+//     };
+// };
+// window.onkeyup = function() {
+//     if (event.keyCode == 32) {
+//         spacebar_pressed = false;
+//     };
+// }
