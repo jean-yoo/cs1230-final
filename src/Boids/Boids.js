@@ -22,7 +22,7 @@ export default class Particle {
 
 	this.swim = function (particles, params) {
 		if (Math.random() < 0.5) {
-			var seekingForce = new THREE.Vector3(0, 0,3)
+			var seekingForce = new THREE.Vector3(0, 0,2)
 		} else {
 			var seekingForce = new THREE.Vector3(-1, 0, 0)
 		}
