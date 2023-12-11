@@ -29,7 +29,7 @@ export default class Particle {
 			this.separation(particles).multiplyScalar(2.2),)
 		} else {
 			forces.push(
-				this.seek(new THREE.Vector3(-2, 0, 4)).multiplyScalar(20),		
+				this.seek(new THREE.Vector3(-5, 0, 2)).multiplyScalar(20),		
 				this.alignment(particles).multiplyScalar(0.01),
 				this.cohesion(particles).multiplyScalar(20),
 				this.separation(particles).multiplyScalar(2.2),

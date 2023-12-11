@@ -71,6 +71,12 @@ cameraPan.maxPolarAngle = Math.PI / 1.6
 // Setup a GUI with our paralocalmeters
 setupControlPanel(snowglobe)
 
+// var debug= new THREE.Mesh(
+//   new THREE.DodecahedronGeometry(10),
+//   new THREE.MeshPhongMaterial({ color: "rgb(71, 50, 36)" }));
+// debug.position.set(-10, 0, 10)
+// snowglobe.scene.add(debug)
+
 var blob, blobs, foid, foids;
 blobs = [];
 foids = [];
@@ -325,16 +331,13 @@ function animate() {
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
 
   updateLighting(snowglobe)
-  // console.log(clock2.getElapsedTime())
-
-  // console.log( snowglobe.gui)
   if (spacebar_pressed) {
-    if (clock.elapsedTime < 0.01) {
-    save_speed = snowglobe.params.snowSpeed; 
+    if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 6)) {
+      save_speed = snowglobe.params.snowSpeed; 
+      console.log(save_speed, "is pressed")
     }
-    // console.log("here", save_speed)
     if (clock.getElapsedTime() < 2) {
-      snowglobe.params.snowSpeed = 5
+      snowglobe.params.snowSpeed = 6
       spacebar_waspressed = true
     }
   }
@@ -342,8 +345,9 @@ function animate() {
     else {
       // console.log(clock2.getElapsedTime(), spacebar_waspressed)
       if (spacebar_waspressed && (clock2.getElapsedTime() > 1)) {
+        console.log(save_speed)
         // console.log("dajf")
-        snowglobe.params.snowSpeed = 1
+        snowglobe.params.snowSpeed = save_speed
         clock2.stop()
         spacebar_waspressed = false; 
       }
@@ -353,7 +357,7 @@ function animate() {
   stats.update()
 }
 animate();
-var save_speed; 
+var save_speed = 100; 
 
 window.addEventListener( 'resize', onWindowResize, false );
 
@@ -409,3 +413,4 @@ function loadAndPlayAudio() {
 }
 
 loadAndPlayAudio();
+
