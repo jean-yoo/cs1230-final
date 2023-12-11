@@ -366,23 +366,6 @@ function onWindowResize(){
 
 }
 
-// AUDIO
-var listener = new THREE.AudioListener();
-camera.add( listener );
-
-// create a global audio source
-var sound = new THREE.Audio( listener );
-
-var audioLoader = new THREE.AudioLoader();
-
-//Load a sound and set it as the Audio object's buffer
-audioLoader.load('../song.mp3', function( buffer ) {
-    sound.setBuffer( buffer );
-    sound.setLoop(true);
-    sound.setVolume(0.2);
-    sound.play();
-});
-
 var spacebar_pressed = false;
 var spacebar_waspressed = false; 
 document.addEventListener("keydown", function(event)
@@ -403,13 +386,26 @@ document.addEventListener("keyup", function(event)
     clock2.start()
 }; 
 });
-// window.onkeydown = function(event) {
-//     if (event.keyCode == 32) {
-//         spacebar_pressed = true;
-//     };
-// };
-// window.onkeyup = function() {
-//     if (event.keyCode == 32) {
-//         spacebar_pressed = false;
-//     };
-// }
+
+// AUDIO
+var listener = new THREE.AudioListener();
+camera.add(listener);
+
+var sound = new THREE.Audio(listener);
+var audioLoader = new THREE.AudioLoader();
+var isAudioPlaying = false;
+
+function loadAndPlayAudio() {
+    audioLoader.load('../song.mp3', function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.2);
+
+        if (!isAudioPlaying) {
+            sound.play();
+            isAudioPlaying = true;
+        }
+    });
+}
+
+loadAndPlayAudio();
