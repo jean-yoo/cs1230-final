@@ -5,8 +5,8 @@ import * as THREE from 'three'
 const RADIUS = 8
 const COL_PARTITIONS = 8
 const LIGHTS_PER_COL = 7
-const Y_MIN = -3
-const Y_MAX = 10
+const Y_MIN = -5
+const Y_MAX = 8
 let circObjs = []
 
 // Initialize the lights onto the scene

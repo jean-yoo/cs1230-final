@@ -23,15 +23,15 @@ const BLOCKTYPE = {
     BASE: 0,
     PRESENTS: 5,
     DOG: 0,
-    SPOTTY:0,
-    THIRDDOG:0,
+    SPOTTY: 0,
+    THIRDDOG: 0,
     TREE: 7
 }
 
 const BOUNDING_RADIUS = {
     HOUSE_SMALL: 1,
     LAMP: 0.2,
-    CHURCH: 2,
+    CHURCH: 2.7,
     SNOWMAN_DERPY: 0.8,
     BASE: 0,
     PRESENTS: 0.2,
@@ -50,7 +50,7 @@ function posToIdx(pos) {
 }
 
 function idxToPos(i, j, k) {
-    let unscaled = new THREE.Vector3(i - radius, j - 2/GRID_SIZE, k - radius);
+    let unscaled = new THREE.Vector3(i - radius, j - 2 / GRID_SIZE, k - radius);
     return unscaled.multiplyScalar(GRID_SIZE)
 }
 
@@ -61,17 +61,18 @@ function translate(obj, dx, dy, dz) {
 let OBJ_DICT = {}
 function loadAssetHelper(path, objName) {
     return loader.loadAsync(path)
-    .then(gltf => { 
-        gltf.scene.traverse((child) => {
-            if (child.isMesh) {
-              child.castShadow = true;
-              child.receiveShadow = true;
-            }
-          });
-        return gltf.scene})
+        .then(gltf => {
+            gltf.scene.traverse((child) => {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+            return gltf.scene
+        })
         .then(object => {
             object.scale.set(GRID_SIZE, GRID_SIZE, GRID_SIZE)
-            OBJ_DICT[objName] = { obj: object, type: BLOCKTYPE[objName], name:objName }
+            OBJ_DICT[objName] = { obj: object, type: BLOCKTYPE[objName], name: objName }
         })
 }
 
@@ -93,19 +94,19 @@ export function addMeshOutline(scene, obj) {
     const outlineClone = obj.clone()
     if (obj.material)
         obj.material = outlineMaterial
-    for (const child of outlineClone.children) { 
+    for (const child of outlineClone.children) {
         if (child.name.includes("roof")) continue
-        child.material = outlineMaterial 
+        child.material = outlineMaterial
     }
     scene.add(outlineClone)
     return outlineClone
 }
 
 function showBounds(scene, pos, br) {
-    const geometry = new THREE.RingGeometry((br-0.03)*GRID_SIZE, br*GRID_SIZE, 32);
+    const geometry = new THREE.RingGeometry((br - 0.03) * GRID_SIZE, br * GRID_SIZE, 32);
     const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(pos.x, pos.y+0.2, pos.z)
+    mesh.position.set(pos.x, pos.y + 0.2, pos.z)
     mesh.rotation.x = Math.PI / 2;
     scene.add(mesh);
 }
@@ -113,7 +114,7 @@ function showBounds(scene, pos, br) {
 function spawnBlock(scene, prototype, idx, visualizeBounds = true, ignoreCollision = false, outline = true) {
     const pos = idxToPos(idx[0], idx[1], idx[2])
     const br = BOUNDING_RADIUS[prototype.name]
-    if (!ignoreCollision) {if (checkCollision(pos, br)) return }
+    if (!ignoreCollision) { if (checkCollision(pos, br)) return }
 
     if (visualizeBounds) showBounds(scene, pos, br)
 
@@ -127,7 +128,7 @@ function spawnBlock(scene, prototype, idx, visualizeBounds = true, ignoreCollisi
 
 function spawnBlockPos(scene, prototype, pos, visualizeBounds = true, ignoreCollision = false, outline = true) {
     const br = BOUNDING_RADIUS[prototype.name]
-    if (!ignoreCollision) {if (checkCollision(pos, br)) return }
+    if (!ignoreCollision) { if (checkCollision(pos, br)) return }
 
     if (visualizeBounds) {
         showBounds(scene, pos, br)
@@ -138,7 +139,7 @@ function spawnBlockPos(scene, prototype, pos, visualizeBounds = true, ignoreColl
     scene.add(blockClone)
 
     if (!ignoreCollision) { collisionBoxes.push({ objType: prototype.type, pos: pos, boundingRadius: br }) }
-    
+
     return blockClone
 }
 
@@ -152,7 +153,7 @@ fiveTone.magFilter = THREE.NearestFilter
 const hatToonMaterial = new THREE.MeshToonMaterial({ color: 0x2FC5FF, gradientMap: threeTone })
 const snowToonMaterial = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap: threeTone })
 const baseToonMaterial = new THREE.MeshToonMaterial({ color: "rgb(71, 50, 36)", gradientMap: threeTone })
-const treeToonMaterial = new THREE.MeshToonMaterial({color: 0x115c25, gradientMap:fiveTone})
+const treeToonMaterial = new THREE.MeshToonMaterial({ color: 0x115c25, gradientMap: fiveTone })
 export async function loadAsset() {
     await loadAssetHelper('../assets/snow_full_height.gltf', "SNOW_FULL_HEIGHT")
     await loadAssetHelper('../assets/house_small.gltf', "HOUSE_SMALL")
@@ -197,9 +198,9 @@ export function checkCollision(pos, br) {
     for (const body of collisionBoxes) {
         const dx = pos.x - body.pos.x
         const dz = pos.z - body.pos.z
-        const r2 = dx * dx  + dz * dz 
+        const r2 = dx * dx + dz * dz
         const minDist = (body.boundingRadius + br) * GRID_SIZE
-        if (r2 < minDist*minDist) { return body }
+        if (r2 < minDist * minDist) { return body }
     }
 
     return undefined
@@ -220,7 +221,7 @@ let lampCount = 0
 const MAX_PRESENT_COUNT = 10
 let presentCount = 0
 
-const MAX_ITR = 20; 
+const MAX_ITR = 20;
 function genMultipleProps(snowglobe, prototype, max, innerRadius, outerRadius, f) {
     let itr = 0
     let count = 0
@@ -228,10 +229,10 @@ function genMultipleProps(snowglobe, prototype, max, innerRadius, outerRadius, f
         if (itr > MAX_ITR) return
         const rand = getRandRange(innerRadius, outerRadius)
         const obj = spawnBlockPos(snowglobe.scene, prototype, new THREE.Vector3(rand.x, -2, rand.z))
-        if (obj) { f(obj); count += 1}
-        itr += 1    
+        if (obj) { f(obj); count += 1 }
+        itr += 1
     }
-} 
+}
 
 export function spawnProps(snowglobe) {
     console.log("Spawning Props...")
@@ -240,7 +241,7 @@ export function spawnProps(snowglobe) {
         base.rotation.x = -Math.PI
         addMeshOutline(snowglobe.scene, base)
     }
-    
+
     const churchFunc = (church) => {
         for (const child of church.children) {
             if (child.name.includes("Window"))
@@ -270,7 +271,7 @@ export function spawnProps(snowglobe) {
     const lampFunc = (lamp) => {
         snowglobe.glowObjs.push(lamp.children[2])
         const pointLight = new THREE.PointLight(0xf5bf42, 1.0)
-        pointLight.position.set(lamp.position.x, lamp.position.y+0.1, lamp.position.z)
+        pointLight.position.set(lamp.position.x, lamp.position.y + 0.1, lamp.position.z)
         pointLight.distance = 1.5 * GRID_SIZE
         pointLight.castShadow = false
         pointLight.intensity = 0
@@ -291,19 +292,19 @@ function getRandRange(innerRadius, outerRadius) {
     var randomRadius = Math.random() * (outerRadius - innerRadius) + innerRadius;
     var x = randomRadius * Math.cos(randomAngle);
     var z = randomRadius * Math.sin(randomAngle);
-    
+
     return { x: x, z: z };
-  }
+}
 
 export function getRand() {
     var randomAngle = Math.random() * 2 * Math.PI;
     var randomRadius = Math.random() * (4.8 - 3.0) + 3.0;
     var x = randomRadius * Math.cos(randomAngle);
     var z = randomRadius * Math.sin(randomAngle);
-    
+
     return { x: x, z: z };
-  }
-  
+}
+
 export function rand(min, max) {
     return Math.random() * (max - min) + min;
 }
@@ -312,11 +313,11 @@ export function randi(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin, bigTree=false) {
+export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin, bigTree = false) {
     var branchesParent = new THREE.Object3D();
     const treePos = new THREE.Vector3(DELTAX, -1.5, DELTAZ)
-    if (checkCollision(treePos, 1/scale)) return undefined
-    
+    if (checkCollision(treePos, 1 / scale)) return undefined
+
     var colorArray = [
         0xf04924, 0xc97a69,
         0xffed69, 0xfcef90,
@@ -335,94 +336,98 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
                 l = count * 4;
             }
             var a = i / count * Math.PI;
-            points2.push( new THREE.Vector2(Math.cos(a) * l, Math.sin(a) * l));
+            points2.push(new THREE.Vector2(Math.cos(a) * l, Math.sin(a) * l));
         }
         var branchShape = new THREE.Shape(points2);
         var branchGeometry = new THREE.ExtrudeGeometry(branchShape, opts);
         var branchMesh = new THREE.Mesh(branchGeometry, treeToonMaterial);
 
-        branchMesh.scale.set(1/(90*skin*scale),skin/(90*scale),1/(90*skin*scale));
+        branchMesh.scale.set(1 / (90 * skin * scale), skin / (90 * scale), 1 / (90 * skin * scale));
         if (y == 0) branchMesh.position.set(DELTAX, 0, DELTAZ);
-        else branchMesh.position.set(DELTAX, y/(9*scale)+DELTAY, DELTAZ);
-        branchMesh.rotation.set(Math.PI / 2, 0,Math.random()*10-1);
+        else branchMesh.position.set(DELTAX, y / (9 * scale) + DELTAY, DELTAZ);
+        branchMesh.rotation.set(Math.PI / 2, 0, Math.random() * 10 - 1);
         branchArray.push(branchMesh)
         branchesParent.add(branchMesh);
     }
 
     // options
     var options = {
-    amount: 2,
-    bevelEnabled: true,
-    bevelSegments: 1,
-    bevelThickness: 3/scale,
-    steps: 5,
-    depth: 40
+        amount: 2,
+        bevelEnabled: true,
+        bevelSegments: 1,
+        bevelThickness: 3 / scale,
+        steps: 5,
+        depth: 40
     };
 
     // add 14 branches
     var iBranchCnt = branches;
     for (var i1 = 0; i1 <= iBranchCnt; i1++) {
         addBranch(iBranchCnt + 3 - i1, DELTAX, -branches + i1, DELTAZ, options);
-        options.bevelThickness = rand(2.5/scale, 3.5/scale);
+        options.bevelThickness = rand(2.5 / scale, 3.5 / scale);
         options.bevelSegments = randi(1, 3);
-        
+
     }
     // add christmas lights
     if (bigTree) {
-    for (var i = 0; i < 24; i++) {
-            var count = Math.floor(i/2)
+        for (var i = 0; i < 24; i++) {
+            var count = Math.floor(i / 2)
             var sphGeometry = new THREE.SphereGeometry(0.07);
             var colorString = colorArray[THREE.MathUtils.randInt(0, 5)]
-            var sphMesh = new THREE.Mesh(sphGeometry, new THREE.MeshPhongMaterial({ 
-                color:new THREE.Color(colorString),
-                emissive: new THREE.Color(colorString)}));
+            var sphMesh = new THREE.Mesh(sphGeometry, new THREE.MeshPhongMaterial({
+                color: new THREE.Color(colorString),
+                emissive: new THREE.Color(colorString)
+            }));
             // const angle = (Math.random() * 320 - 70) * Math.PI/180;
-            let angle = 2*Math.PI*Math.random()
+            let angle = 2 * Math.PI * Math.random()
             var scale = 0;
             if (count > 7) {
-                scale = 15.5 - count 
+                scale = 15.5 - count
             } else {
                 scale = 13.5 - count
             }
-            sphMesh.position.set(Math.cos(angle)*0.06*scale+0.5, branchArray[count].position.y-0.1, Math.sin(angle)*scale*0.06);
+            sphMesh.position.set(Math.cos(angle) * 0.06 * scale + 0.5, branchArray[count].position.y - 0.1, Math.sin(angle) * scale * 0.06);
             branchesParent.add(sphMesh)
             if (Math.random() < 0.3) {
-            const pointLight = new THREE.PointLight(colorString, 1.0)
-            pointLight.position.set(sphMesh.position.x, sphMesh.position.y, sphMesh.position.z)
-            pointLight.distance = 1.5 * GRID_SIZE
-            pointLight.castShadow = false
-            pointLight.intensity = 0
-            snowglobe.scene.add(pointLight)
-            snowglobe.glowObjs.push(pointLight)
+                const pointLight = new THREE.PointLight(colorString, 1.0)
+                pointLight.position.set(sphMesh.position.x, sphMesh.position.y, sphMesh.position.z)
+                pointLight.distance = 1.5 * GRID_SIZE
+                pointLight.castShadow = false
+                pointLight.intensity = 0
+                snowglobe.scene.add(pointLight)
+                snowglobe.glowObjs.push(pointLight)
             }
+            
+            collisionBoxes.push({objType:BLOCKTYPE.TREE, pos: treePos, boundingRadius: 3/scale })
         }
+    } else {
+        collisionBoxes.push({ objType: BLOCKTYPE.TREE, pos: treePos, boundingRadius: 1 / scale })
     }
-    
-    collisionBoxes.push({objType:BLOCKTYPE.TREE, pos: treePos, boundingRadius: 1/scale })
-    showBounds(snowglobe.scene, treePos, 1/scale)
+
+    showBounds(snowglobe.scene, treePos, 1 / scale)
     return branchesParent;
 }
 
 export function genStar(innerRadius, outerRadius) {
     const shape = new THREE.Shape();
     for (let i = 0; i < 5; i++) {
-    const theta = (i / 5) * Math.PI * 2;
-    const x = Math.cos(theta);
-    const y = Math.sin(theta);
-    if (i === 0) {
-        shape.moveTo(x * outerRadius, y * outerRadius);
-    } else {
-        shape.lineTo(x * outerRadius, y * outerRadius);
-    }
+        const theta = (i / 5) * Math.PI * 2;
+        const x = Math.cos(theta);
+        const y = Math.sin(theta);
+        if (i === 0) {
+            shape.moveTo(x * outerRadius, y * outerRadius);
+        } else {
+            shape.lineTo(x * outerRadius, y * outerRadius);
+        }
 
-    const innerTheta = ((i + 0.5) / 5) * Math.PI * 2;
-    shape.lineTo(Math.cos(innerTheta) * innerRadius, Math.sin(innerTheta) * innerRadius);
+        const innerTheta = ((i + 0.5) / 5) * Math.PI * 2;
+        shape.lineTo(Math.cos(innerTheta) * innerRadius, Math.sin(innerTheta) * innerRadius);
     }
 
     const extrudeSettings = {
-    steps: 1,
-    depth: 5,
-    bevelEnabled: false
+        steps: 1,
+        depth: 5,
+        bevelEnabled: false
     };
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     return geometry;
