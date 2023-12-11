@@ -295,8 +295,15 @@ export function randi(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin, treeMaterial) {
+export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin, treeMaterial, bigTree = false) {
     var branchesParent = new THREE.Object3D();
+    var angleStep = (Math.PI * 2) / 2;
+    var colorArray = [
+        0xf04924, 0xc97a69,
+        0xffed69, 0xfcef90,
+        0x44e38c, 0x81a692
+    ]
+    var branchArray = []
 
     var x = 0, y = 0;
     function addBranch(count, x, y, z, opts) {
@@ -319,7 +326,7 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
         if (y == 0) branchMesh.position.set(DELTAX, 0, DELTAZ);
         else branchMesh.position.set(DELTAX, y/(9*scale)+DELTAY, DELTAZ);
         branchMesh.rotation.set(Math.PI / 2, 0,Math.random()*10-1);
-        
+        branchArray.push(branchMesh)
         branchesParent.add(branchMesh);
     }
 
@@ -339,6 +346,38 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
         addBranch(iBranchCnt + 3 - i1, DELTAX, -branches + i1, DELTAZ, options);
         options.bevelThickness = rand(2.5/scale, 3.5/scale);
         options.bevelSegments = randi(1, 3);
+        
+    }
+    if (bigTree) {
+    for (var i = 0; i < 24; i++) {
+            var count = Math.floor(i/2)
+            var sphGeometry = new THREE.SphereGeometry(0.07);
+            var colorString = colorArray[THREE.MathUtils.randInt(0, 5)]
+            var sphMesh = new THREE.Mesh(sphGeometry, new THREE.MeshPhongMaterial({ 
+                color:new THREE.Color(colorString),
+                emissive: new THREE.Color(colorString)}));
+            // const angle = (Math.random() * 320 - 70) * Math.PI/180;
+            let angle = 2*Math.PI*Math.random()
+            var scale = 0;
+            if (count > 7) {
+                scale = 15.5 - count 
+            } else {
+                scale = 13.5 - count
+            }
+            sphMesh.position.set(Math.cos(angle)*0.06*scale+0.5, branchArray[count].position.y-0.1, Math.sin(angle)*scale*0.06);
+            // sphMesh.position.set(branchMesh.position.x + 40/90 + Math.random()*0.1, branchMesh.position.y, branchMesh.position.z+40/90+ Math.random()*0.1)
+            branchesParent.add(sphMesh)
+            // snowglobe.glowObjs.push(lamp.children[2])
+            if (Math.random() < 0.3) {
+            const pointLight = new THREE.PointLight(colorString, 1.0)
+            pointLight.position.set(sphMesh.position.x, sphMesh.position.y, sphMesh.position.z)
+            pointLight.distance = 1.5 * GRID_SIZE
+            pointLight.castShadow = false
+            pointLight.intensity = 0
+            snowglobe.scene.add(pointLight)
+            snowglobe.glowObjs.push(pointLight)
+            }
+        }
     }
     
     return branchesParent;
