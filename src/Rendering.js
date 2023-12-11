@@ -52,6 +52,7 @@ export function setupBloomRendering(scene, camera, renderer, outlineObjs = []) {
         new THREE.ShaderMaterial({
             uniforms: {
                 baseTexture: { value: outlineTexture.texture },
+                // baseTexture: { value: null },
                 // edgeTexture: { value: edgeComposer.renderTarget2.texture },
                 bloomTexture: { value: bloomComposer.renderTarget2.texture }
             },
@@ -59,6 +60,7 @@ export function setupBloomRendering(scene, camera, renderer, outlineObjs = []) {
             fragmentShader: fragmentShader
         }))
     const outputPass = new OutputPass()
+    combineComposer.addPass(renderPass)
     combineComposer.addPass(combinePass)
     combineComposer.addPass(outputPass)
 }

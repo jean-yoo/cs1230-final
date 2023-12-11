@@ -18,18 +18,10 @@ let effect;
 
 const snowglobe = {
   gui: undefined,
-  // container: document.getElementById('container'),
-  // canvas: document.getElementById('cityscape'),
-  // screenResolution: undefined,
   autorun: false,
   scene: undefined,
   renderer: undefined,
-  // cloudComposer: undefined,
-  // bloomComposer: undefined,
-  // shaderComposer: undefined,
-  // orbitControls: undefined,
   params: undefined,
-  // stats: undefined, // Temporary
   glass: undefined,
   perlinSnow: undefined,
   groundSide: undefined,
@@ -53,7 +45,7 @@ snowglobe.scene.background = BG_COLOR.BLOOM_OFF
 
 var clock = new THREE.Clock()
 clock.start()
-console.log("Clock started")
+
 // Setup camera
 let camera = new THREE.PerspectiveCamera(
   75, // field of view angle
@@ -71,7 +63,8 @@ document.body.appendChild(snowglobe.renderer.domElement);
 const stats = new Stats()
 document.body.appendChild(stats.dom)
 
-effect = new OutlineEffect(snowglobe.renderer, {defaultThickness: 0.005});
+effect = new OutlineEffect(snowglobe.renderer);
+console.log(effect)
 effect.enabled = true
 
 // Setup camera rotation on mouse click
@@ -82,6 +75,12 @@ cameraPan.maxPolarAngle = Math.PI / 1.8
 
 // Setup a GUI with our paralocalmeters
 setupControlPanel(snowglobe)
+
+// var debug= new THREE.Mesh(
+//   new THREE.DodecahedronGeometry(10),
+//   new THREE.MeshPhongMaterial({ color: "rgb(71, 50, 36)" }));
+// debug.position.set(-10, 0, 10)
+// snowglobe.scene.add(debug)
 
 var blob, blobs, foid, foids;
 blobs = [];
@@ -142,7 +141,7 @@ loadAsset().then(() => { ASSETS_LOADED = true; })
 // Add some lights!
 setupLights(snowglobe.scene, snowglobe)
 genBgLights(snowglobe.scene)
-// generateSnowParticles(snowglobe.scene)
+//generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 //generateSnowParticles(snowglobe.scene)
 snowglobe.params.timeOfDay = 18.431
@@ -157,12 +156,13 @@ const SNOW_COUNT = 300;
 let treesAdded = false
 var pivotContainer
 let starMaterial
+let starPointLight
 function generateTrees() {
   // MAIN TREE w/ STAR
   const textureLoader = new THREE.TextureLoader();
   const treeTexture = textureLoader.load('../pineTexture.jpg');
   // const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5 });
-  snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1));
+  snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1, { bigTree: true }));
   const starGeometry = genStar(5, 10); // Function to create star geometry
   starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
   const star = new THREE.Mesh(starGeometry, starMaterial);
@@ -174,6 +174,15 @@ function generateTrees() {
   pivotContainer.add(star);
   pivotContainer.position.copy(pivotPoint);
   snowglobe.scene.add(pivotContainer);
+
+  // light
+  starPointLight = new THREE.PointLight(0xfffff, 1.0)
+  // pointLight.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
+  starPointLight.position.set(star.position.x, 0, star.position.z)
+  starPointLight.distance = 0
+  starPointLight.castShadow = false
+  snowglobe.scene.add(starPointLight)
+  snowglobe.glowObjs.push(starPointLight)
 
   // Randomly scattered trees
   var tree, newPosition;
@@ -202,8 +211,6 @@ function generateTrees() {
     snowglobe.scene.add(tree);
   }
 }
-
-
 
 // ADDING SNOW
 var snow = new THREE.Group();
@@ -250,11 +257,11 @@ snowglobe.scene.add(snow);
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
-//generateSnowParticles(snowglobe.scene)
+// generateSnowParticles(snowglobe.scene)
 
 const GLOBE_BLOOM = { off: 0, on: 1 }
 let globeBloom = GLOBE_BLOOM.off
-const isNight = () => snowglobe.params.timeOfDay < 8.5 || snowglobe.params.timeOfDay > 20
+const isNight = () => snowglobe.params.timeOfDay < 7 || snowglobe.params.timeOfDay > 20
 
 let renderSetup = false
 function animate() {
@@ -274,11 +281,11 @@ function animate() {
 
   if (treesAdded && propsGenerated && !renderSetup) {
     setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
-    renderSetup=true
+    renderSetup = true
   }
 
-   // Turn the lights off at night
-   if (isNight() && globeBloom == GLOBE_BLOOM.off) {
+  // Turn the lights off at night
+  if (isNight() && globeBloom == GLOBE_BLOOM.off) {
     for (const obj of snowglobe.glowObjs) { enableGlow(obj) }
     globeBloom = GLOBE_BLOOM.on
   } else if (!isNight() && globeBloom == GLOBE_BLOOM.on) {
@@ -288,13 +295,9 @@ function animate() {
 
   cameraPan.update()
 
-  // if (clock.getElapsedTime() - genTime > 2) {
-  //   generateSnowParticles(snowglobe.scene)
-  //   genTime = clock.getElapsedTime()
-  // }
   for (var i = 0, n = blobs.length; i < n; i++) {
     foid = foids[i];
-    foid.swim(foids);
+    foid.swim(foids, snowglobe.params);
     blob = blobs[i]; blob.position.copy(foids[i].position);
 
     // blob.lookAt(new THREE.Vector3(foids[i].velocity))
@@ -324,7 +327,7 @@ function animate() {
     blob.rotateY(Math.PI)
   }
 
-  //moveSnowParticles(snowglobe.scene)
+  //moveSnowParticles(snowglobe.params)
   // new particle movement
   for (var i = 0; i < snow.children.length; i++) {
     if (snow.children[i].position.y * snow.children[i].position.y + snow.children[i].position.x * snow.children[i].position.x
@@ -333,7 +336,7 @@ function animate() {
       var v = velocities[i];
       var rv = rotationalVelocities[i];
       snow.children[i].position.x += v.x / 200;
-      snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay - 12) + 1) / 2) * v.y / 200;
+      snow.children[i].position.y += snowglobe.params.snowSpeed * v.y / 100;
       snow.children[i].position.z += v.z / 200;
 
       snow.children[i].rotation.x += rv.x / 2000;
@@ -342,31 +345,53 @@ function animate() {
     }
   }
   moveLights(camera, clock)
-
   if (treesAdded) {
+    pivotContainer.rotation.z += 0.01;
+    // console.log(star.position)
     const time = Date.now() * 0.001;
     const flashSpeed = 0.5;
-    pivotContainer.rotation.z += 0.01;
     const intensity = Math.abs(Math.sin(time * flashSpeed));
     starMaterial.color.setRGB(Math.cos(intensity * 5) * 0.5, Math.cos(intensity * 5) * 0.5, Math.sin(intensity * 2) * 0.5);
+    starPointLight.color.setRGB(Math.cos(intensity * 5), Math.cos(intensity * 5), Math.sin(intensity * 2));
   }
-
   // This function call abstracts away post-processing steps
-  bloomRender(snowglobe.scene, snowglobe.renderer, effect, camera)
+  if (treesAdded && propsGenerated)
+    bloomRender(snowglobe.scene, snowglobe.renderer, effect, camera)
 
   //auto-run
   if (snowglobe.params.autorun) {
     snowglobe.params.timeOfDay += 0.02
   }
   if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
-  // if (isNight()) snowglobe.scene.fog.density += 0.0003;
-  // else snowglobe.scene.fog.density -= 0.0003;
-  // if (snowglobe.params.timeOfDay > 23.4) snowglobe.params.timeOfDay = 0
 
   updateLighting(snowglobe)
+  if (spacebar_pressed) {
+    if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 7)) {
+      save_speed = snowglobe.params.snowSpeed;
+      console.log(save_speed, "is pressed")
+    }
+    if (clock.getElapsedTime() < 2) {
+      snowglobe.params.snowSpeed = 7
+      spacebar_waspressed = true
+    }
+  }
+  //   }
+  else {
+    // console.log(clock2.getElapsedTime(), spacebar_waspressed)
+    if (spacebar_waspressed && (clock2.getElapsedTime() > 2)) {
+      console.log(save_speed)
+      // console.log("dajf")
+      snowglobe.params.snowSpeed = save_speed
+      clock2.stop()
+      spacebar_waspressed = false;
+    }
+  }
+
+
   stats.update()
 }
 animate();
+var save_speed = 100;
 
 window.addEventListener('resize', onWindowResize, false);
 
@@ -376,18 +401,47 @@ function onWindowResize() {
   snowglobe.renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// AUDIO
-var listener = new THREE.AudioListener();
-camera.add(listener);
-
-// create a global audio source
-var sound = new THREE.Audio(listener);
-var audioLoader = new THREE.AudioLoader();
-
-//Load a sound and set it as the Audio object's buffer
-audioLoader.load('../song.mp3', function (buffer) {
-  sound.setBuffer(buffer);
-  sound.setLoop(true);
-  sound.setVolume(0.2);
-  sound.play();
+var spacebar_pressed = false;
+var spacebar_waspressed = false;
+document.addEventListener("keydown", function (event) {
+  if (event.keyCode == 32) {
+    spacebar_pressed = true;
+    clock.start()
+  };
 });
+
+var clock2 = new THREE.Clock()
+document.addEventListener("keyup", function (event) {
+  if (event.keyCode == 32) {
+    console.log(event.keyCode)
+    spacebar_pressed = false;
+    clock.stop()
+    clock2.start()
+  };
+});
+
+// AUDIO
+if (snowglobe.params.music) {
+  var listener = new THREE.AudioListener();
+  camera.add(listener);
+
+  var sound = new THREE.Audio(listener);
+  var audioLoader = new THREE.AudioLoader();
+  var isAudioPlaying = false;
+
+  function loadAndPlayAudio() {
+    audioLoader.load('../song.mp3', function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(0.2);
+
+      if (!isAudioPlaying) {
+        sound.play();
+        isAudioPlaying = true;
+      }
+    });
+  }
+
+  loadAndPlayAudio();
+}
+
