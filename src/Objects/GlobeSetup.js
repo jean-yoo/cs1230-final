@@ -3,7 +3,7 @@ import { CircularPerlinMesh } from '../Perlin';
 
 export function generateGlobeAndGround(snowglobe) {
     // The globe itself
-    var sphereGeometry = new THREE.SphereGeometry(6, 32, 32);
+    var sphereGeometry = new THREE.SphereGeometry(6, 64, 64);
     var sphereMaterial = new THREE.MeshPhongMaterial({
         color: "#fff",
         opacity: 0.2,
@@ -27,10 +27,9 @@ export function generateGlobeAndGround(snowglobe) {
     // var globeGlass = new THREE.Mesh(g_geometry, g_material);
     globeGlass.name = "SNOW_SPHERE"
     globeGlass.receiveShadow = false
-    snowglobe.glowObjs.push(globeGlass)
+    // snowglobe.glowObjs.push(globeGlass)
     snowglobe.scene.add(globeGlass);
     globeGlass.layers.toggle(2)
-    snowglobe.glass = globeGlass; 
     
     // Cap
     const circleGeometry = new THREE.CircleGeometry(5.35, 32);
@@ -54,10 +53,13 @@ export function generateGlobeAndGround(snowglobe) {
     snowglobe.scene.add(groundSide);
     // groundCap.layers.toggle(2)
     groundSide.layers.toggle(2)
+    snowglobe.outlineObjs.push(groundSide)
+    snowglobe.outlineObjs.push(globeGlass)
 
     // Perlin snow
     const perlinSnow = CircularPerlinMesh(10.5, 30)
     snowglobe.scene.add(perlinSnow)
     perlinSnow.position.set(-5.2, -3.1, -5.2)
     perlinSnow.receiveShadow = true
+    snowglobe.outlineObjs.push(perlinSnow)
 }

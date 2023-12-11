@@ -29,7 +29,8 @@ export function genBgLights(scene) {
             const circle = new THREE.Mesh(circGeom, circMat)
             circle.layers.toggle(1)
             circle.position.set(lightX, lightY, lightZ)
-            circObjs.push({ mesh: circle, xTheta: xThetaInit, zTheta:zThetaInit, phase:THREE.MathUtils.randFloat(0, 2*Math.PI)})
+            circObjs.push({ mesh: circle, xTheta: xThetaInit, zTheta:zThetaInit, phase:THREE.MathUtils.randFloat(0, 2*Math.PI)})  
+            circle.name = "BG_LIGHT"
             scene.add(circle)
         }
     }
@@ -64,5 +65,6 @@ export function moveLights(camera, clock) {
                 circle.layers.enable(1)
             }
         }
+
     }
 }

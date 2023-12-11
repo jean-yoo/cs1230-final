@@ -22,14 +22,14 @@ export default class Particle {
 
 	this.swim = function (particles) {
 		const forces = []
-		var collisionResult = checkCollision(this.position, 0.5)
+		var collisionResult = checkCollision(this.position, 0.3)
 		if (!(collisionResult === undefined)) {
 			forces.push(this.calculateTangent(collisionResult).multiplyScalar(50),
 			this.wander().multiplyScalar(20),
 			this.separation(particles).multiplyScalar(2.2),)
 		} else {
 			forces.push(
-				this.seek(new THREE.Vector3(-2, 0, -2)).multiplyScalar(22),		
+				this.seek(new THREE.Vector3(-2, 0, 2)).multiplyScalar(25),		
 				this.alignment(particles).multiplyScalar(0.01),
 				this.cohesion(particles).multiplyScalar(20),
 				this.separation(particles).multiplyScalar(2.2),
@@ -61,7 +61,7 @@ export default class Particle {
 	  this.direction = this.velocity.clone();
 	  this.direction.normalize();
 	  const frameVelocity = this.velocity.clone()
-	  frameVelocity.multiplyScalar(0.6)
+	  frameVelocity.multiplyScalar(0.8)
 	  this.position.add(frameVelocity);
 	};
 

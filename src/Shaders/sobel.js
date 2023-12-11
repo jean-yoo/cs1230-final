@@ -2,7 +2,6 @@ export const edgeFragShader = `
 uniform sampler2D base;
 uniform float H;
 uniform float W;
-uniform float c;
 varying vec2 uvCoords;
 
 float toGrayscale(vec4 color) {

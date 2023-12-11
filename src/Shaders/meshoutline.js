@@ -5,8 +5,7 @@ export const outlineShader = {
         uniform float GRID_SIZE;
         uniform float thickness;
         void main() {
-            vec3 extrudeP = position + thickness*GRID_SIZE*normalize(normalMatrix*normal);
-            // extrudeP.y *= 0.5
+            vec3 extrudeP = position + thickness*GRID_SIZE*normalize(normal);
             gl_Position = projectionMatrix * modelViewMatrix * vec4(extrudeP, 1.0 );
         }`,
     frag: `
