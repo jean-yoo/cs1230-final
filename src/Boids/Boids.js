@@ -22,9 +22,9 @@ export default class Particle {
 
 	this.swim = function (particles, params) {
 		if (Math.random() < 0.5) {
-			var seekingForce = new THREE.Vector3(0, 0,-2)
+			var seekingForce = new THREE.Vector3(0, 0,3)
 		} else {
-			var seekingForce = new THREE.Vector3(-2, 0, 0)
+			var seekingForce = new THREE.Vector3(-1, 0, 0)
 		}
 		const forces = []
 		var collisionResult = checkCollision(this.position, 0.4)

@@ -30,11 +30,11 @@ const BLOCKTYPE = {
 
 const BOUNDING_RADIUS = {
     HOUSE_SMALL: 1,
-    LAMP: 0.2,
+    LAMP: 0,
     CHURCH: 2.7,
-    SNOWMAN_DERPY: 0.8,
+    SNOWMAN_DERPY: 0.9,
     BASE: 0,
-    PRESENTS: 0.2,
+    PRESENTS: 0.7,
     DOG: 0
 }
 
@@ -401,8 +401,8 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
             collisionBoxes.push({objType:BLOCKTYPE.TREE, pos: treePos, boundingRadius: 4/scale })
         }
     } else {
-        collisionBoxes.push({ objType: BLOCKTYPE.TREE, pos: treePos, boundingRadius: 2 / scale })
-    }
+        collisionBoxes.push({ objType: BLOCKTYPE.TREE, pos: treePos, boundingRadius: 1 / scale })
+    } 
 
     // showBounds(snowglobe.scene, treePos, 1 / scale)
     return branchesParent;
