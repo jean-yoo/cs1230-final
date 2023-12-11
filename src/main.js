@@ -135,10 +135,9 @@ loadAsset().then(() => { ASSETS_LOADED = true; })
 // Add some lights!
 setupLights(snowglobe.scene, snowglobe)
 genBgLights(snowglobe.scene)
-// generateSnowParticles(snowglobe.scene)
+generateSnowParticles(snowglobe.scene)
 generateGlobeAndGround(snowglobe)
 setupBloomRendering(snowglobe.scene, camera, snowglobe.renderer)
-//generateSnowParticles(snowglobe.scene)
 snowglobe.params.timeOfDay = 18.431
 
 /*
@@ -152,7 +151,7 @@ const SNOW_COUNT = 300;
 const textureLoader = new THREE.TextureLoader();
 const treeTexture = textureLoader.load('../pineTexture.jpg');
 const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5});
-snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1, treeMaterial));
+snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1, treeMaterial, true));
 const starGeometry = genStar(5, 10); // Function to create star geometry
 const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
 const star = new THREE.Mesh(starGeometry, starMaterial);
@@ -164,6 +163,14 @@ var pivotContainer = new THREE.Object3D();
 pivotContainer.add(star);
 pivotContainer.position.copy(pivotPoint);
 snowglobe.scene.add(pivotContainer);
+// light
+const pointLight = new THREE.PointLight(0xfffff, 1.0)
+// pointLight.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
+pointLight.position.set(star.position.x, 0, star.position.z)
+pointLight.distance = 0
+pointLight.castShadow = false
+snowglobe.scene.add(pointLight)
+snowglobe.glowObjs.push(pointLight)
 
 // Randomly scattered trees
 var tree, newPosition;
@@ -188,7 +195,6 @@ for (let i = 0.0; i < NUM_TREES; i++) {
   } while (!(checkCollision(tree.position, 1) === undefined));
   snowglobe.scene.add(tree);
 }
-
 
 // ADDING SNOW
 var snow = new THREE.Group();
@@ -235,11 +241,11 @@ snowglobe.scene.add(snow);
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0
-//generateSnowParticles(snowglobe.scene)
+// generateSnowParticles(snowglobe.scene)
 
 const GLOBE_BLOOM = { off: 0, on: 1 }
 let globeBloom = GLOBE_BLOOM.off
-const isNight = () => snowglobe.params.timeOfDay < 8.5 || snowglobe.params.timeOfDay > 20
+const isNight = () => snowglobe.params.timeOfDay < 7 || snowglobe.params.timeOfDay > 20
 
 function animate() {
   requestAnimationFrame(animate);
@@ -287,30 +293,31 @@ function animate() {
     blob.rotateY(Math.PI)
   }
 
-  //moveSnowParticles(snowglobe.scene)
+  moveSnowParticles(snowglobe.scene)
   // new particle movement
-  for (var i = 0; i < snow.children.length; i++) {
-    if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
-      + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
-    else {
-      var v = velocities[i];
-      var rv = rotationalVelocities[i];
-      snow.children[i].position.x += v.x/200;
-      snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay-12)+1) / 2)*v.y/200;
-      snow.children[i].position.z += v.z/200;
+  // for (var i = 0; i < snow.children.length; i++) {
+  //   if (snow.children[i].position.y*snow.children[i].position.y + snow.children[i].position.x*snow.children[i].position.x
+  //     + snow.children[i].position.z*snow.children[i].position.z > 30) reSnow(i);
+  //   else {
+  //     var v = velocities[i];
+  //     var rv = rotationalVelocities[i];
+  //     snow.children[i].position.x += v.x/200;
+  //     snow.children[i].position.y += ((Math.abs(snowglobe.params.timeOfDay-12)+1) / 2)*v.y/200;
+  //     snow.children[i].position.z += v.z/200;
       
-      snow.children[i].rotation.x += rv.x / 2000;
-      snow.children[i].rotation.y += rv.y / 2000;
-      snow.children[i].rotation.z += rv.z / 2000;
-    }
-  }
+  //     snow.children[i].rotation.x += rv.x / 2000;
+  //     snow.children[i].rotation.y += rv.y / 2000;
+  //     snow.children[i].rotation.z += rv.z / 2000;
+  //   }
+  // }
   moveLights(camera, clock)
   pivotContainer.rotation.z += 0.01;
+  // console.log(star.position)
   const time = Date.now() * 0.001;
   const flashSpeed = 0.5;
   const intensity = Math.abs(Math.sin(time * flashSpeed));
   starMaterial.color.setRGB(Math.cos(intensity*5)*0.5, Math.cos(intensity*5)*0.5, Math.sin(intensity*2)*0.5);
-
+  pointLight.color.setRGB(Math.cos(intensity*5), Math.cos(intensity*5), Math.sin(intensity*2));
   // This function call abstracts away post-processing steps
   bloomRender(snowglobe.scene, effect, camera)
 
