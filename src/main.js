@@ -352,8 +352,6 @@ function animate() {
         spacebar_waspressed = false; 
       }
     }
-
-
   stats.update()
 }
 animate();
