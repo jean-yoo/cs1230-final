@@ -222,38 +222,37 @@ var velocities = [];
 var rotationalVelocities = [];
 
 function reSnow(idx) {
-  var n = Math.acos(-1 + (2 * idx) / 200)
-    , t = Math.sqrt(200 * Math.PI) * n;
+  var n = Math.acos(-1+(2 * idx )/ 200)
+        , t = Math.sqrt(200 * Math.PI) * n;
   mesh = snow.children[idx];
-  mesh.position.x = (150 * Math.sin(n) * Math.cos(t)) / 40;
-  mesh.position.y = (Math.random() * (150 - (-150)) - 150) / 60 + 3;
-  mesh.position.z = (150 * Math.cos(n) + Math.floor(Math.random() * 40 + 1)) / 40;
+  mesh.position.x = (150 * Math.sin( n) * Math.cos( t))/40;
+  mesh.position.y=(Math.random()*(150-(-150))-150)/60 + 3;
+  mesh.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/40;
 }
 
 var geometry = new THREE.BufferGeometry().setFromPoints(points);
-var material = new THREE.LineBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-for (var i = 0; i < SNOW_COUNT; i++) {
+var material = new THREE.LineBasicMaterial( { color: 0xffffff ,side: THREE.DoubleSide } );
+for (var i=0;i<SNOW_COUNT;i++) {
   var mesh = new THREE.Line(geometry, material);
   var lineObject = new THREE.Object3D();
   lineObject.add(mesh);
-  lineObject.scale.set(0.05, 0.05, 0.05);
-  var n = Math.acos(-1 + (2 * i) / 200), t = Math.sqrt(200 * Math.PI) * n;
-  lineObject.position.x = (150 * Math.sin(n) * Math.cos(t)) / 30;
-  lineObject.position.y = (Math.random() * (150 - (-150)) - 150) / 60 + 4;
-  lineObject.position.z = (150 * Math.cos(n) + Math.floor(Math.random() * 40 + 1)) / 30;
+  lineObject.scale.set(0.05,0.05,0.05);
+  var n = Math.acos(-1+(2 * i )/ 200), t = Math.sqrt(200 * Math.PI) * n;
+  lineObject.position.x = (150 * Math.sin( n) * Math.cos( t))/30;
+  lineObject.position.y=(Math.random()*(150-(-150))-150)/60 + 4;
+  lineObject.position.z = (150 * Math.cos( n)+Math.floor(Math.random()*40+1))/30;
 
-  const velocity = new THREE.Vector3(rand(-2, 2), rand(-0.1, -1), 0);
+  const velocity = new THREE.Vector3(rand(-2,2),rand(-0.1, -1),0);
   velocities.push(velocity);
-  const rot = randi(0, 3);
+  const rot = randi(0,3);
   var rotationalVelocity;
-  if (rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30, 30), 0, 0)
-  if (rot === 1) rotationalVelocity = new THREE.Vector3(0, rand(-30, 30), 0)
-  if (rot === 2) rotationalVelocity = new THREE.Vector3(0, 0, rand(-30, 30))
+  if (rot === 0) rotationalVelocity = new THREE.Vector3(rand(-30,30),0,0)
+  else if (rot === 1) rotationalVelocity = new THREE.Vector3(0,rand(-30,30),0)
+  else rotationalVelocity = new THREE.Vector3(0,0,rand(-30,30))
   rotationalVelocities.push(rotationalVelocity);
   snow.add(lineObject);
 }
 snowglobe.scene.add(snow);
-
 // Rendering Loop: This is the "paintGL" equivalent in three.js
 let propsGenerated = false
 var genTime = 0

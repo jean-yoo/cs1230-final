@@ -102,14 +102,14 @@ export function addMeshOutline(scene, obj) {
     return outlineClone
 }
 
-function showBounds(scene, pos, br) {
-    const geometry = new THREE.RingGeometry((br - 0.03) * GRID_SIZE, br * GRID_SIZE, 32);
-    const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(pos.x, pos.y + 0.2, pos.z)
-    mesh.rotation.x = Math.PI / 2;
-    scene.add(mesh);
-}
+// function showBounds(scene, pos, br) {
+//     const geometry = new THREE.RingGeometry((br - 0.03) * GRID_SIZE, br * GRID_SIZE, 32);
+//     const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
+//     const mesh = new THREE.Mesh(geometry, material);
+//     mesh.position.set(pos.x, pos.y + 0.2, pos.z)
+//     mesh.rotation.x = Math.PI / 2;
+//     scene.add(mesh);
+// }
 
 function spawnBlock(scene, prototype, idx, visualizeBounds = true, ignoreCollision = false, outline = true) {
     const pos = idxToPos(idx[0], idx[1], idx[2])
@@ -130,9 +130,9 @@ function spawnBlockPos(scene, prototype, pos, visualizeBounds = true, ignoreColl
     const br = BOUNDING_RADIUS[prototype.name]
     if (!ignoreCollision) { if (checkCollision(pos, br)) return }
 
-    if (visualizeBounds) {
-        showBounds(scene, pos, br)
-    }
+    // if (visualizeBounds) {
+    //     showBounds(scene, pos, br)
+    // }
 
     const blockClone = prototype.obj.clone()
     blockClone.position.set(pos.x, pos.y, pos.z)
@@ -248,7 +248,7 @@ export function spawnProps(snowglobe) {
                 snowglobe.glowObjs.push(child)
         }
     }
-    genMultipleProps(snowglobe, OBJ_DICT["CHURCH"], MAX_CHURCH_COUNT, 0, 2, churchFunc)
+    // genMultipleProps(snowglobe, OBJ_DICT["CHURCH"], MAX_CHURCH_COUNT, 0, 2, churchFunc)
 
     const houseFunc = (houseSmall) => {
         houseSmall.rotation.y = Math.random() * 2 * Math.PI
@@ -398,13 +398,13 @@ export function genTree(snowglobe, scale, branches, DELTAX, DELTAY, DELTAZ, skin
                 snowglobe.glowObjs.push(pointLight)
             }
             
-            collisionBoxes.push({objType:BLOCKTYPE.TREE, pos: treePos, boundingRadius: 3/scale })
+            collisionBoxes.push({objType:BLOCKTYPE.TREE, pos: treePos, boundingRadius: 4/scale })
         }
     } else {
-        collisionBoxes.push({ objType: BLOCKTYPE.TREE, pos: treePos, boundingRadius: 1 / scale })
+        collisionBoxes.push({ objType: BLOCKTYPE.TREE, pos: treePos, boundingRadius: 2 / scale })
     }
 
-    showBounds(snowglobe.scene, treePos, 1 / scale)
+    // showBounds(snowglobe.scene, treePos, 1 / scale)
     return branchesParent;
 }
 
