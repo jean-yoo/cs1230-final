@@ -340,9 +340,9 @@ function animate() {
   }
   //   }
     else {
-      console.log(clock2.getElapsedTime(), spacebar_waspressed)
+      // console.log(clock2.getElapsedTime(), spacebar_waspressed)
       if (spacebar_waspressed && (clock2.getElapsedTime() > 1)) {
-        console.log("dajf")
+        // console.log("dajf")
         snowglobe.params.snowSpeed = 1
         clock2.stop()
         spacebar_waspressed = false; 
