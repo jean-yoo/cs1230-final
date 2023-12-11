@@ -343,17 +343,23 @@ function onWindowResize(){
 
 // AUDIO
 var listener = new THREE.AudioListener();
-camera.add( listener );
+camera.add(listener);
 
-// create a global audio source
-var sound = new THREE.Audio( listener );
-
+var sound = new THREE.Audio(listener);
 var audioLoader = new THREE.AudioLoader();
+var isAudioPlaying = false;
 
-//Load a sound and set it as the Audio object's buffer
-audioLoader.load('../song.mp3', function( buffer ) {
-    sound.setBuffer( buffer );
-    sound.setLoop(true);
-    sound.setVolume(0.2);
-    sound.play();
-});
+function loadAndPlayAudio() {
+    audioLoader.load('../song.mp3', function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.2);
+
+        if (!isAudioPlaying) {
+            sound.play();
+            isAudioPlaying = true;
+        }
+    });
+}
+
+loadAndPlayAudio();
