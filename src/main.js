@@ -285,30 +285,30 @@ function animate() {
 
   // ADUASODIFJSDAOIJFOISAJF AUDIO
   // AUDIO
-  if (snowglobe.params.music && audioCount == 0) {
-    var listener = new THREE.AudioListener();
-    camera.add(listener);
+  // if (snowglobe.params.music && audioCount == 0) {
+  //   var listener = new THREE.AudioListener();
+  //   camera.add(listener);
 
-    sound = new THREE.Audio(listener);
-    var audioLoader = new THREE.AudioLoader();
-    var isAudioLoaded = false;
-    var isAudioPlaying = false;
+  //   sound = new THREE.Audio(listener);
+  //   var audioLoader = new THREE.AudioLoader();
+  //   var isAudioLoaded = false;
+  //   var isAudioPlaying = false;
 
-    function loadAudio() {
-      audioLoader.load('./assets/song.mp3', function (buffer) {
-        sound.setBuffer(buffer);
-        sound.setLoop(true);
-        sound.setVolume(0.2);
-        sound.stop()
-        if (!sound.isPlaying) {
-        sound.play()
-        }
-        isAudioLoaded = true;
-      });
-    }
-    loadAudio();
-    audioCount = 1
-  }
+  //   function loadAudio() {
+  //     audioLoader.load('./assets/song.mp3', function (buffer) {
+  //       sound.setBuffer(buffer);
+  //       sound.setLoop(true);
+  //       sound.setVolume(0.2);
+  //       sound.stop()
+  //       if (!sound.isPlaying) {
+  //       sound.play()
+  //       }
+  //       isAudioLoaded = true;
+  //     });
+  //   }
+  //   loadAudio();
+  //   audioCount = 1
+  // }
 
   for (var i = 0, n = blobs.length; i < n; i++) {
     boid = boids[i];
@@ -377,14 +377,14 @@ function animate() {
     }
   }
 
-  if (!(snowglobe.params.music) && audioCount == 1) {
-    console.log(audioCount)
-    sound.pause()
-  } else if(snowglobe.params.music && audioCount == 1) {
-    if (!sound.isPlaying) {
-      sound.play()
-    }
-  }
+  // if (!(snowglobe.params.music) && audioCount == 1) {
+  //   console.log(audioCount)
+  //   sound.pause()
+  // } else if(snowglobe.params.music && audioCount == 1) {
+  //   if (!sound.isPlaying) {
+  //     sound.play()
+  //   }
+  // }
   stats.update()
 }
 animate();

@@ -14,7 +14,7 @@ export function setupControlPanel(snowglobe) {
     gui.add(parameters, 'timeOfDay', 0, 24)
     gui.add(parameters, 'autorun')
     gui.add(parameters, 'snowSpeed', 0.5, 3)
-    gui.add(parameters, 'music')
+    // gui.add(parameters, 'music')
 
     snowglobe.params = parameters
     gui.close()
