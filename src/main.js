@@ -368,7 +368,7 @@ if (snowglobe.params.music) {
   var isAudioPlaying = false;
 
   function loadAudio() {
-    audioLoader.load('assets/song.mp3', function (buffer) {
+    audioLoader.load('./assets/song.mp3', function (buffer) {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);
