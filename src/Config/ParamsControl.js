@@ -5,7 +5,7 @@ let parameters = {
     timeOfDay: 18.432, 
     autorun: false,
     snowSpeed: 1,
-    music: true
+    music: false
  }
 
 export function setupControlPanel(snowglobe) { 
