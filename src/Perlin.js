@@ -20,7 +20,7 @@ class Perlin {
     constructor(m,n,freqs=[1]) {
         this.m = m
         this.n = n
-        // this.grid = new Array(m * n)
+
         this.grid = new Array(LOOKUP_SIZE)
         this.freqs = freqs
         for (let i=0; i<this.grid.length; i++) {
@@ -35,12 +35,7 @@ class Perlin {
     }
 
     getRandomVec2 = (col, row) => {
-        // console.log( Math.floor(i*7 + j*11) )
-        // const idx = Math.abs(Math.floor(i*7 + j*11)) % LOOKUP_SIZE
-        // console.log(col,row)
-        // const v = this.grid[(row%this.m)*this.m + col%this.n]
         const v = this.grid[(row*13 + col*23) % LOOKUP_SIZE]
-        // console.log(v)
         return v
     }
     
@@ -58,10 +53,10 @@ class Perlin {
         const v2 = dot(this.getRandomVec2(col, row+1), offset2)
         const v3 = dot(this.getRandomVec2(col+1, row), offset3)
         const v4 = dot(this.getRandomVec2(col+1, row+1), offset4)
-        // console.log("v2", v2)
+
         const u1 = interpolate(v1, v2, 0.5)
         const u2 = interpolate(v3, v4, 0.5)
-        // console.log("u2", u2)
+
 
         return interpolate(u1,u2, 0.5)
     }
@@ -113,27 +108,17 @@ export function CircularPerlinMesh(size, res) {
         }
     }
     
-    // const mat = new THREE.MeshBasicMaterial({color: 0xffffff})
-    // const sphereGeom = new THREE.SphereGeometry(0.01)
-    // let points = []
-    // for (let i=0; i<vertices.length; i+=3) {
-    //     const x = vertices[i]; const y = vertices[i+1]; const z = vertices[i+2];
-    //     const v = new THREE.Mesh(sphereGeom, mat)
-    //     v.position.set(x,y,z)
-    //     points.push(v)
-    // }
-    // console.log(vertices)
+
     vertices = new Float32Array(vertices)
     const fiveTone = new THREE.TextureLoader().load('../assets/ToonShadingGradientMaps/fiveTone.jpg')
     fiveTone.minFilter = THREE.NearestFilter
     fiveTone.magFilter = THREE.NearestFilter
     const snowToonMaterial = new THREE.MeshToonMaterial({ color: "rgb(230, 225, 223)", gradientMap: fiveTone })
-    // const mat = new THREE.MeshPhongMaterial({color:0xffffff})
+
     let geom = new THREE.BufferGeometry()
     geom.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
     geom.deleteAttribute("normal")
     geom = BufferGeometryUtils.mergeVertices(geom);
-    console.log(geom)
     geom.computeVertexNormals()
 
     const mesh = new THREE.Mesh(geom, snowToonMaterial)

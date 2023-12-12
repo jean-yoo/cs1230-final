@@ -11,7 +11,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 import Particle from './Boids/Boids'
 import { checkCollision } from './GenerateProps';
 import { generateGlobeAndGround } from './Objects/GlobeSetup';
-import { OutlineEffect } from '../OutlineEffect';
+import { OutlineEffect } from './OutlineEffect';
 import { plotSnow } from './Objects/TreeSnow';
 import { getRand, rand, randi, genTree, genStar } from './GenerateProps';
 let effect;
@@ -64,7 +64,6 @@ const stats = new Stats()
 document.body.appendChild(stats.dom)
 
 effect = new OutlineEffect(snowglobe.renderer);
-console.log(effect)
 effect.enabled = true
 
 // Setup camera rotation on mouse click
@@ -82,9 +81,9 @@ setupControlPanel(snowglobe)
 // debug.position.set(-10, 0, 10)
 // snowglobe.scene.add(debug)
 
-var blob, blobs, foid, foids;
+var blob, blobs, boid, boids;
 blobs = [];
-foids = [];
+boids = [];
 var count = 0;
 
 const MAX_ITR = 100
@@ -93,26 +92,17 @@ function spawnBoids(dogs) {
   while (count != 8) {
     if (itr > MAX_ITR) break
     // init each particle at a random position and velocity
-    foid = foids[count] = new Particle();
-    foid.position = new THREE.Vector3(1, -1.85, 1);
-    // console.log(foid.position)
-    // console.log(foid)
-    // foid.position.x = 0; foid.position.y = -2; foid.position.z = 0;
-    // console.log(checkCollision(foid.position, 1))
-    while (checkCollision(foid.position, 1)) {
-      //foid.position.x = 0; foid.position.y = -1.8; foid.position.z = 0;
-      // console.log("dasfjs")
+    boid = boids[count] = new Particle();
+    boid.position = new THREE.Vector3(1, -1.85, 1);
+    while (checkCollision(boid.position, 1)) {
       if (count >= 0 && count < 4) {
-        foid.position.x = THREE.MathUtils.randFloat(-1, -3.0); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(-4.5, -1.0);
+        boid.position.x = THREE.MathUtils.randFloat(-1, -3.0); boid.position.y = -1.85; boid.position.z = THREE.MathUtils.randFloat(-4.5, -1.0);
       } else if ((count >= 4) && (count < 8)) {
-        foid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(2.0, 4.5);
+        boid.position.x = THREE.MathUtils.randFloat(2.0, 5.5); boid.position.y = -1.85; boid.position.z = THREE.MathUtils.randFloat(2.0, 4.5);
       } else {
-        foid.position.x = THREE.MathUtils.randFloat(-1, 0.9); foid.position.y = -1.85; foid.position.z = THREE.MathUtils.randFloat(1.0, 1.2);
+        boid.position.x = THREE.MathUtils.randFloat(-1, 0.9); boid.position.y = -1.85; boid.position.z = THREE.MathUtils.randFloat(1.0, 1.2);
       }
     }
-
-    // foid.velocity.x = 0.00001; foid.velocity.y = 0; foid.velocity.z = 0.00001;
-    // foid.setBoundaries(8, 8, 8);
     var dog_prob = Math.random()
     if (dog_prob < 0.4) {
       blob = blobs[count] = dogs[0].obj.clone()
@@ -121,15 +111,10 @@ function spawnBoids(dogs) {
     } else {
       blob = blobs[count] = dogs[2].obj.clone()
     }
-    // new THREE.Mesh(
-    //   new THREE.DodecahedronGeometry(0.3),
-    //   new THREE.MeshPhongMaterial({ color: "rgb(71, 50, 36)" }));
     blob.receiveShadow = true
     blob.castShadow = true
-    blob.position.copy(foids[count].position)
+    blob.position.copy(boids[count].position)
     blob.rotation.x = 0; blob.rotation.y = 0; blob.rotation.z = 0;
-    // blob.lookAt(new THREE.Vector3(-50, 0, THREE.MathUtils.randFloat(-90, -10)));
-    // blob.state = Math.ceil(Math.random() * 15);
     snowglobe.scene.add(blob);
     count++;
     itr++;
@@ -274,7 +259,7 @@ function animate() {
   if (!propsGenerated) {
     const dogs = spawnProps(snowglobe);
     spawnBoids(dogs)
-    console.log("Spawned Dogs!")
+    // console.log("Spawned Dogs!")
     propsGenerated = true;
   }
 
@@ -295,34 +280,14 @@ function animate() {
   cameraPan.update()
 
   for (var i = 0, n = blobs.length; i < n; i++) {
-    foid = foids[i];
-    foid.swim(foids, snowglobe.params);
-    blob = blobs[i]; blob.position.copy(foids[i].position);
+    boid = boids[i];
+    boid.move(boids, snowglobe.params);
+    blob = blobs[i]; blob.position.copy(boids[i].position);
 
-    // blob.lookAt(new THREE.Vector3(foids[i].velocity))
-
-    // Update the orientation of the foid
-    // blob.rotation.x = foids[i].direction.x; 
-    //blob.rotation.z= foids[i].direction.z; 
-    // blob.rotation.y = 1 * Math.atan2(- foid.velocity.z, foid.velocity.x);
-    // blob.rotation.z = 1 * Math.asin(foid.velocity.y / foid.velocity.length());
-    // blob.rotation.x = foid.direction.x * -10000
-    // blob.rotation.y =-90
-    // blob.rotation.z = foid.direction.z
-    // blob.lookAt(foid.direction.clone().multiplyScalar(-1000000).x, -2, 0)
-    // const dir = new THREE.Vector3()
-    // blob.getWorldDirection(dir)
-    // const ler = dir.lerp(foid.direction.clone().multiplyScalar(-10000), 1)
-    // var idk = blob.worldToLocal(new THREE.Vector3(0,0,0))
-    // // console.log(dir)
-    // // console.log(ler.normalize())
-    // // console.log(-1*Math.abs(dir.x), -1*Math.abs(dir.z))
-    // // blob.lookAt(new THREE.Vector3(0, -2, 0))
-    // // blob.rotateY(dir.x * 0.02 - dir.z * 0.01)
     var mat = blob.matrix
-    var idk = foid.direction.applyMatrix4(mat)
+    var transformedDir = boid.direction.applyMatrix4(mat)
 
-    blob.lookAt(new THREE.Vector3(-idk.x * 0.1, -2, idk.z * 0.1))
+    blob.lookAt(new THREE.Vector3(-transformedDir.x * 0.1, -2, transformedDir.z * 0.1))
     blob.rotateY(Math.PI)
   }
 
@@ -346,7 +311,6 @@ function animate() {
   moveLights(camera, clock)
   if (treesAdded) {
     pivotContainer.rotation.z += 0.01;
-    // console.log(star.position)
     const time = Date.now() * 0.001;
     const flashSpeed = 0.5;
     const intensity = Math.abs(Math.sin(time * flashSpeed));
@@ -376,10 +340,8 @@ function animate() {
   }
   //   }
   else {
-    // console.log(clock2.getElapsedTime(), spacebar_waspressed)
     if (spacebar_waspressed && (clock2.getElapsedTime() > 2)) {
       console.log(save_speed)
-      // console.log("dajf")
       snowglobe.params.snowSpeed = save_speed
       clock2.stop()
       spacebar_waspressed = false;
@@ -429,7 +391,7 @@ if (snowglobe.params.music) {
   var isAudioPlaying = false;
 
   function loadAndPlayAudio() {
-    audioLoader.load('../song.mp3', function (buffer) {
+    audioLoader.load('assets/song.mp3', function (buffer) {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.2);

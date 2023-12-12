@@ -1,21 +1,10 @@
 /* Add all the light sources in here */
 import * as THREE from 'three'
 let dirLight
-let planeMesh, planeMaterial
-// function addDirLight(scene, color, intensity, position, toggleHelper) {
-//     const dirLight = new THREE.DirectionalLight(color, intensity);
-//     dirLight.position.set(position[0], position[1], position[2])
-//     scene.add(dirLight);
-//     dirLight.castShadow = true
-//     if (toggleHelper) {
-//         const helper = new THREE.DirectionalLightHelper(dirLight, 1);
-//         scene.add(helper);
-//     }
-// }
+
 export function setupLights(scene, snowglobe) {
     prevTimeOfDay = snowglobe.params.timeOfDay
-    // addDirLight(scene, 0xffffff, 0.9, [0,0,3], true)
-    // addDirLight(scene, 0xffffff, 0.9, [-1,3,0], true)
+
     snowglobe.renderer.shadowMap.enabled = true
     snowglobe.renderer.shadowMap.type = THREE.PCFSoftShadowMap
 
@@ -24,20 +13,6 @@ export function setupLights(scene, snowglobe) {
     dirLight.layers.enable(0)
     dirLight.layers.enable(1)
     dirLight.castShadow = true
-    // dirLight.color.setHSL( 0.1, 1, 0.95 );
-    // dirLight.position.set( - 1, 1.75, 1 );
-    // dirLight.position.multiplyScalar( 30 );
-    // dirLight.shadow.mapSize.width = 2048;
-    // dirLight.shadow.mapSize.height = 2048;
-    // const d = 50;
-
-    // dirLight.shadow.camera.left = - d;
-    // dirLight.shadow.camera.right = d;
-    // dirLight.shadow.camera.top = d;
-    // dirLight.shadow.camera.bottom = - d;
-
-    // dirLight.shadow.camera.far = 3500;
-    // dirLight.shadow.bias = - 0.0001;
     
     scene.add(dirLight)
 
@@ -90,13 +65,8 @@ function updateTimeOfDay(snowglobe) {
   dirLight.intensity = snowglobe.params.dirLightIntensity
   const color1 = new THREE.Color(); 
 
-  // snowglobe.glass.material.color.set(color1.lerpColors((nightColor, dayColor, dayness)))
-  // snowglobe.glass.material.color.set(color1.lerp(duskColor, duskness))
-
   snowglobe.scene.background.set(color1.lerpColors(nightColor, dayColor, dayness))
   snowglobe.scene.background.set(color1.lerp(duskColor, duskness))
-
-  // console.log(snowglobe.scene.background)
 
 
 }

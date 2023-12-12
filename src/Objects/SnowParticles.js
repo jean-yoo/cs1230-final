@@ -34,9 +34,6 @@ export function generateSnowParticles(scene) {
     const circMat = new THREE.MeshBasicMaterial({ color: 0xfbe2ba })
     var tex = new THREE.TextureLoader().load("https://threejs.org/examples/textures/sprites/disc.png");
 
-
-    // const flakeMaterial = new THREE.PointsMaterial({ map: tex, size:0.2,transparent:true,
-    //     depthWrite: true});
     const flakeMaterial = new THREE.PointsMaterial({ color: 0xFFFFFF, size:0.1 });
     particles = new THREE.Points(geometry, flakeMaterial)
     scene.add(particles)
@@ -44,7 +41,6 @@ export function generateSnowParticles(scene) {
 }
 
 export function moveSnowParticles(params) {
-    //console.log(particles.geometry.attributes.velocity.array)
     for (let i = 0; i <= numSnowflakes*3; i+= 3) {
         particles.geometry.attributes.position.array[i] -= particles.geometry.attributes.velocity.array[i] * params.snowSpeed
         particles.geometry.attributes.position.array[i+1] -= particles.geometry.attributes.velocity.array[i+1] * params.snowSpeed

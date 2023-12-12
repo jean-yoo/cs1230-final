@@ -1,8 +1,6 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { outlineShader } from './Shaders/meshoutline'
-//import { genTree, genStar, plotSnow, getRand, rand, randi } from './Objects/TreeSnow'
-// import { EDGE_LAYER } from './Rendering'
 
 const loader = new GLTFLoader()
 var radius = 4 // number of blocks for the FLOOR
@@ -101,7 +99,7 @@ export function addMeshOutline(scene, obj) {
     scene.add(outlineClone)
     return outlineClone
 }
-
+// for debug
 // function showBounds(scene, pos, br) {
 //     const geometry = new THREE.RingGeometry((br - 0.03) * GRID_SIZE, br * GRID_SIZE, 32);
 //     const material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide });
@@ -235,7 +233,6 @@ function genMultipleProps(snowglobe, prototype, max, innerRadius, outerRadius, f
 }
 
 export function spawnProps(snowglobe) {
-    console.log("Spawning Props...")
     const base = spawnBlock(snowglobe.scene, OBJ_DICT["BASE"], [radius, 0, radius], false, true, false)//.rotation.x = -Math.PI;
     if (base) {
         base.rotation.x = -Math.PI

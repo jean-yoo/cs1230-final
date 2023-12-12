@@ -31,7 +31,6 @@ let combineComposer
 let edgeComposer
 const outlineTexture = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight)
 export function setupBloomRendering(scene, camera, renderer, outlineObjs = []) {
-    console.log(renderer)
     bloomComposer = new EffectComposer(renderer)
     const renderPass = new RenderPass(scene, camera)
     const bloomPass = new UnrealBloomPass(
@@ -45,7 +44,6 @@ export function setupBloomRendering(scene, camera, renderer, outlineObjs = []) {
 
     combineComposer = new EffectComposer(renderer)
     const outlinePass = new OutlinePass(new THREE.Vector2(window.innerWidth, window.innerHeight), scene, camera)
-    console.log(outlineObjs)
     outlinePass.selectedObjects = outlineObjs
     outlinePass.hiddenEdgeColor.set(new THREE.Color("black"))
     const combinePass = new ShaderPass(

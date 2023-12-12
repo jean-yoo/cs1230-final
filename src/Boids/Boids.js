@@ -9,18 +9,8 @@ export default class Particle {
 	this.direction = new THREE.Vector3(-1,0,0);
 	this.velocity = this.direction.clone(); 
 	this.wanderAngle = 0;
-	var _acceleration = new THREE.Vector3();
 
-	var _depth, _height, _width, _goal, _padding = 5, _speed = 0.1,
-		_maneuver = 10;
-
-	this.setBoundaries = function (width, height, depth) {
-		_width = width;
-		_height = height;
-		_depth = depth;
-	};
-
-	this.swim = function (particles, params) {
+	this.move = function (particles, params) {
 		if (Math.random() < 0.5) {
 			var seekingForce = new THREE.Vector3(0, 0,2)
 		} else {
@@ -48,23 +38,25 @@ export default class Particle {
     	for (const f of forces) {
       		steeringForce.add(f);
     	} steeringForce.multiplyScalar(0.01);
-	steeringForce.setComponent(1, 0)
-	if (steeringForce.length() > 0.01) {
-		steeringForce.normalize();
-		steeringForce.multiplyScalar(0.001);
-	}
-	this.velocity.add(steeringForce)
-	this.velocity.setComponent(1, 0); 
-	if (this.velocity.length() > 0.01) {
-		this.velocity.normalize();
-		this.velocity.multiplyScalar(0.01);
-	  }
 
+		steeringForce.setComponent(1, 0)
+		if (steeringForce.length() > 0.01) {
+			steeringForce.normalize();
+			steeringForce.multiplyScalar(0.001);
+		}
+		this.velocity.add(steeringForce)
+		this.velocity.setComponent(1, 0); 
+		if (this.velocity.length() > 0.01) {
+			this.velocity.normalize();
+			this.velocity.multiplyScalar(0.01);
+		}
 
+	  // check collision with glass 
 	  this.checkEdge(this.velocity);
 	  this.velocity.setComponent(1, 0);
 	  this.direction = this.velocity.clone();
 	  this.direction.normalize();
+
 	  const frameVelocity = this.velocity.clone()
 	  if (params.snowSpeed >= 1) {
 		frameVelocity.multiplyScalar(0.8 * params.snowSpeed)
@@ -82,8 +74,6 @@ export default class Particle {
 	}; 
 
     this.checkEdge = function(vector) {
-        let nedge = -3.5;
-        let edge = 3.5; 
         let offset = 0.01; 
 
 		if ((Math.sqrt(this.position.x * this.position.x + this.position.z * this.position.z) >= 4.9)
@@ -115,7 +105,6 @@ export default class Particle {
 		direction = dest.clone().subVectors(dest, this.position);
 		direction.normalize();
 		direction.multiplyScalar(distance)
-		// console.log(direction)
 		return direction
 	  }
 
