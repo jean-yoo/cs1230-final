@@ -145,7 +145,6 @@ let starPointLight
 function generateTrees() {
   // MAIN TREE w/ STAR
   const textureLoader = new THREE.TextureLoader();
-  const treeTexture = textureLoader.load('../pineTexture.jpg');
   // const treeMaterial = new THREE.MeshStandardMaterial({ map: treeTexture, color: new THREE.Color(0x007B0A), roughness: 0.5 });
   snowglobe.scene.add(genTree(snowglobe, 1, 14, 0.5, 0, 0, 1, { bigTree: true }));
   const starGeometry = genStar(5, 10); // Function to create star geometry
