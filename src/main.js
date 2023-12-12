@@ -380,28 +380,28 @@ document.addEventListener("keyup", function (event) {
   };
 });
 
-// AUDIO
-if (snowglobe.params.music) {
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
+// // AUDIO
+// if (snowglobe.params.music) {
+//   var listener = new THREE.AudioListener();
+//   camera.add(listener);
 
-  var sound = new THREE.Audio(listener);
-  var audioLoader = new THREE.AudioLoader();
-  var isAudioPlaying = false;
+//   var sound = new THREE.Audio(listener);
+//   var audioLoader = new THREE.AudioLoader();
+//   var isAudioPlaying = false;
 
-  function loadAndPlayAudio() {
-    audioLoader.load('assets/song.mp3', function (buffer) {
-      sound.setBuffer(buffer);
-      sound.setLoop(true);
-      sound.setVolume(0.2);
+//   function loadAndPlayAudio() {
+//     audioLoader.load('assets/song.mp3', function (buffer) {
+//       sound.setBuffer(buffer);
+//       sound.setLoop(true);
+//       sound.setVolume(0.2);
 
-      if (!isAudioPlaying) {
-        sound.play();
-        isAudioPlaying = true;
-      }
-    });
-  }
+//       if (!isAudioPlaying) {
+//         sound.play();
+//         isAudioPlaying = true;
+//       }
+//     });
+//   }
 
-  loadAndPlayAudio();
-}
+//   loadAndPlayAudio();
+// }
 
