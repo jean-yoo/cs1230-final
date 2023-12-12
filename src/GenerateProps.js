@@ -27,7 +27,7 @@ const BLOCKTYPE = {
 }
 
 const BOUNDING_RADIUS = {
-    HOUSE_SMALL: 1,
+    HOUSE_SMALL: 1.2,
     LAMP: 0,
     CHURCH: 2.7,
     SNOWMAN_DERPY: 0.9,

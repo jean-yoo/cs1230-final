@@ -60,8 +60,8 @@ snowglobe.renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(snowglobe.renderer.domElement);
 
 // Setup FPS stats panel
-const stats = new Stats()
-document.body.appendChild(stats.dom)
+// const stats = new Stats()
+// document.body.appendChild(stats.dom)
 
 effect = new OutlineEffect(snowglobe.renderer);
 effect.enabled = true
@@ -385,7 +385,7 @@ function animate() {
   //     sound.play()
   //   }
   // }
-  stats.update()
+  // stats.update()
 }
 animate();
 var save_speed = 100;
