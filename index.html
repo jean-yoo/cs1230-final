@@ -5,13 +5,111 @@
 		<title>Snow Globe</title>
 		<style>
 			body { margin: 0; }
+			#myButton, #restartButton {
+            display: none;
+            position: fixed;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+			font-family: cursive;
+			font-style: oblique;
+			}
+
+			#myButton {
+				bottom: 60px;
+				right: 20px;
+				background-color: #e74c3c; /* Red */
+				color: #fff;
+			}
+
+			#restartButton {
+				bottom: 20px;
+				right: 20px;
+				background-color: #2ecc71; /* Green */
+				color: #fff;
+			}
+
+			#myButton:hover, #restartButton:hover {
+            	animation: colorChange 0.5s infinite alternate;
+        	}
+
+			@keyframes colorChange {
+				0% {
+					background-color: #c0392b; /* Darker red */
+				}
+				100% {
+					background-color: #27ae60; /* Darker green */
+				}
+			}
 		</style>
+    		<title>Song Player</title>
 	</head>
 	<body>
+		<audio id="myAudio">
+			<source src="assets/song.mp3" type="audio/mp3">
+		</audio>
+		<button id="myButton" onclick="toggleAudio()">pause</button>
+		<button id="restartButton" onclick="restartAudio()">restart</button>
+
+		<script>
+			function toggleAudio() {
+				var audio = document.getElementById("myAudio");
+				if (audio.paused) {
+					audio.play();
+				} else {
+					audio.pause();
+				}
+			}
+
+			function restartAudio() {
+				var audio = document.getElementById("myAudio");
+				audio.currentTime = 0;
+				audio.play();
+			}
+
+			function savePlaybackStatus() {
+				var audio = document.getElementById("myAudio");
+				localStorage.setItem("audioTime", audio.currentTime);
+				localStorage.setItem("audioPaused", audio.paused);
+			}
+
+			function loadPlaybackStatus() {
+				var audio = document.getElementById("myAudio");
+				var audioTime = localStorage.getItem("audioTime");
+				var audioPaused = localStorage.getItem("audioPaused");
+
+				if (audioTime !== null && audioPaused !== null) {
+					audio.currentTime = parseFloat(audioTime);
+					if (audioPaused === "false") {
+						audio.play();
+					}
+				}
+			}
+
+			window.addEventListener("beforeunload", savePlaybackStatus);
+
+			document.addEventListener("DOMContentLoaded", loadPlaybackStatus);
+
+			// Display the button only when hovering over a specific area
+			var buttons = document.querySelectorAll("button");
+			document.body.addEventListener("mousemove", function (event) {
+				if (event.clientX > window.innerWidth - 100 && event.clientY > window.innerHeight - 100) {
+					buttons.forEach(function (button) {
+						button.style.display = "block";
+					});
+				} else {
+					buttons.forEach(function (button) {
+						button.style.display = "none";
+					});
+				}
+			});
+
+		</script>
 		<script type="module" src="/src/main.js"></script>
-		<audio src="song.mp3" autoplay></audio>
 		<!-- import song from 'public/song.mp3'
 		<audio src=song autoplay></audio>
 		  </audio> -->
+
 	</body>
 </html>

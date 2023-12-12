@@ -381,31 +381,31 @@ document.addEventListener("keyup", function (event) {
 });
 
 // // AUDIO
-if (snowglobe.params.music) {
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
+// if (snowglobe.params.music) {
+//   var listener = new THREE.AudioListener();
+//   camera.add(listener);
 
-  var sound = new THREE.Audio(listener);
-  var audioLoader = new THREE.AudioLoader();
-  var isAudioLoaded = false;
-  var isAudioPlaying = false;
+//   var sound = new THREE.Audio(listener);
+//   var audioLoader = new THREE.AudioLoader();
+//   var isAudioLoaded = false;
+//   var isAudioPlaying = false;
 
-  function loadAudio() {
-    audioLoader.load('assets/song.mp3', function (buffer) {
-      sound.setBuffer(buffer);
-      sound.setLoop(true);
-      sound.setVolume(0.2);
-      isAudioLoaded = true;
-    });
-  }
+//   function loadAudio() {
+//     audioLoader.load('assets/song.mp3', function (buffer) {
+//       sound.setBuffer(buffer);
+//       sound.setLoop(true);
+//       sound.setVolume(0.2);
+//       isAudioLoaded = true;
+//     });
+//   }
 
-  function playAudio() {
-    if (isAudioLoaded && !isAudioPlaying) {
-      sound.play();
-      isAudioPlaying = true;
-    }
-  }
+//   function playAudio() {
+//     if (isAudioLoaded && !isAudioPlaying) {
+//       sound.play();
+//       isAudioPlaying = true;
+//     }
+//   }
 
-  loadAudio();
-  snowglobe.addEventListener('click', playAudio);
-}
+//   loadAudio();
+//   snowglobe.addEventListener('click', playAudio);
+// }
