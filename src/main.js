@@ -330,7 +330,6 @@ function animate() {
   if (spacebar_pressed) {
     if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 7)) {
       save_speed = snowglobe.params.snowSpeed;
-      console.log(save_speed, "is pressed")
     }
     if (clock.getElapsedTime() < 2) {
       snowglobe.params.snowSpeed = 7
@@ -340,7 +339,6 @@ function animate() {
   //   }
   else {
     if (spacebar_waspressed && (clock2.getElapsedTime() > 2)) {
-      console.log(save_speed)
       snowglobe.params.snowSpeed = save_speed
       clock2.stop()
       spacebar_waspressed = false;
@@ -403,7 +401,6 @@ document.addEventListener("keydown", function (event) {
 var clock2 = new THREE.Clock()
 document.addEventListener("keyup", function (event) {
   if (event.keyCode == 32) {
-    console.log(event.keyCode)
     spacebar_pressed = false;
     clock.stop()
     clock2.start()
