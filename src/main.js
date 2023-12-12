@@ -196,10 +196,14 @@ function generateTrees() {
   }
 }
 
+
+var audioCount = 0
+
 // ADDING SNOW
 var snow = new THREE.Group();
 var snowPath = new THREE.Path();
 plotSnow(snowPath);
+
 
 var points = snowPath.getPoints();
 var velocities = [];
@@ -247,6 +251,7 @@ let globeBloom = GLOBE_BLOOM.off
 const isNight = () => snowglobe.params.timeOfDay < 7 || snowglobe.params.timeOfDay > 20
 
 let renderSetup = false
+let sound;
 function animate() {
   requestAnimationFrame(animate);
   if (!ASSETS_LOADED) return
@@ -277,6 +282,33 @@ function animate() {
   }
 
   cameraPan.update()
+
+  // ADUASODIFJSDAOIJFOISAJF AUDIO
+  // AUDIO
+  if (snowglobe.params.music && audioCount == 0) {
+    var listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    sound = new THREE.Audio(listener);
+    var audioLoader = new THREE.AudioLoader();
+    var isAudioLoaded = false;
+    var isAudioPlaying = false;
+
+    function loadAudio() {
+      audioLoader.load('./assets/song.mp3', function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.2);
+        sound.stop()
+        if (!sound.isPlaying) {
+        sound.play()
+        }
+        isAudioLoaded = true;
+      });
+    }
+    loadAudio();
+    audioCount = 1
+  }
 
   for (var i = 0, n = blobs.length; i < n; i++) {
     boid = boids[i];
@@ -330,7 +362,6 @@ function animate() {
   if (spacebar_pressed) {
     if (clock.elapsedTime < 0.009 && (snowglobe.params.snowSpeed != 7)) {
       save_speed = snowglobe.params.snowSpeed;
-      console.log(save_speed, "is pressed")
     }
     if (clock.getElapsedTime() < 2) {
       snowglobe.params.snowSpeed = 7
@@ -340,14 +371,20 @@ function animate() {
   //   }
   else {
     if (spacebar_waspressed && (clock2.getElapsedTime() > 2)) {
-      console.log(save_speed)
       snowglobe.params.snowSpeed = save_speed
       clock2.stop()
       spacebar_waspressed = false;
     }
   }
 
-
+  if (!(snowglobe.params.music) && audioCount == 1) {
+    console.log(audioCount)
+    sound.pause()
+  } else if(snowglobe.params.music && audioCount == 1) {
+    if (!sound.isPlaying) {
+      sound.play()
+    }
+  }
   stats.update()
 }
 animate();
@@ -373,39 +410,33 @@ document.addEventListener("keydown", function (event) {
 var clock2 = new THREE.Clock()
 document.addEventListener("keyup", function (event) {
   if (event.keyCode == 32) {
-    console.log(event.keyCode)
     spacebar_pressed = false;
     clock.stop()
     clock2.start()
   };
 });
 
-// // AUDIO
-// if (snowglobe.params.music) {
-//   var listener = new THREE.AudioListener();
-//   camera.add(listener);
+// const listener = new THREE.AudioListener();
+// camera.add( listener );
 
-//   var sound = new THREE.Audio(listener);
-//   var audioLoader = new THREE.AudioLoader();
-//   var isAudioLoaded = false;
-//   var isAudioPlaying = false;
+// // create a global audio source
+// const sound = new THREE.Audio( listener );
+// sound.hasPlaybackControl = true
 
-//   function loadAudio() {
-//     audioLoader.load('assets/song.mp3', function (buffer) {
-//       sound.setBuffer(buffer);
-//       sound.setLoop(true);
-//       sound.setVolume(0.2);
-//       isAudioLoaded = true;
-//     });
-//   }
+// // load a sound and set it as the Audio object's buffer
+// const audioLoader = new THREE.AudioLoader();
+// audioLoader.load( 'assets/song.mp3', function( buffer ) {
+// 	sound.setBuffer( buffer );
+// 	sound.setLoop( true );
+// 	sound.setVolume( 0.2 );
+// 	sound.pause();
+// });
 
-//   function playAudio() {
-//     if (isAudioLoaded && !isAudioPlaying) {
-//       sound.play();
-//       isAudioPlaying = true;
-//     }
-//   }
+  // function playAudio() {
+  //   if (isAudioLoaded && !isAudioPlaying) {
+  //     sound.play();
+  //     isAudioPlaying = true;
+  //   }
+  // }
+//   // snowglobe.scene.addEventListener('click', playAudio);
 
-//   loadAudio();
-//   snowglobe.addEventListener('click', playAudio);
-// }
