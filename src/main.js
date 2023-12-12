@@ -196,10 +196,14 @@ function generateTrees() {
   }
 }
 
+
+var audioCount = 0
+
 // ADDING SNOW
 var snow = new THREE.Group();
 var snowPath = new THREE.Path();
 plotSnow(snowPath);
+
 
 var points = snowPath.getPoints();
 var velocities = [];
@@ -247,6 +251,7 @@ let globeBloom = GLOBE_BLOOM.off
 const isNight = () => snowglobe.params.timeOfDay < 7 || snowglobe.params.timeOfDay > 20
 
 let renderSetup = false
+let sound;
 function animate() {
   requestAnimationFrame(animate);
   if (!ASSETS_LOADED) return
@@ -277,6 +282,33 @@ function animate() {
   }
 
   cameraPan.update()
+
+  // ADUASODIFJSDAOIJFOISAJF AUDIO
+  // AUDIO
+  if (snowglobe.params.music && audioCount == 0) {
+    var listener = new THREE.AudioListener();
+    camera.add(listener);
+
+    sound = new THREE.Audio(listener);
+    var audioLoader = new THREE.AudioLoader();
+    var isAudioLoaded = false;
+    var isAudioPlaying = false;
+
+    function loadAudio() {
+      audioLoader.load('./assets/song.mp3', function (buffer) {
+        sound.setBuffer(buffer);
+        sound.setLoop(true);
+        sound.setVolume(0.2);
+        sound.stop()
+        if (!sound.isPlaying) {
+        sound.play()
+        }
+        isAudioLoaded = true;
+      });
+    }
+    loadAudio();
+    audioCount = 1
+  }
 
   for (var i = 0, n = blobs.length; i < n; i++) {
     boid = boids[i];
@@ -345,39 +377,16 @@ function animate() {
     }
   }
 
-
-  stats.update()
-  if (!snowglobe.params.music) {
+  if (!(snowglobe.params.music) && audioCount == 1) {
+    console.log(audioCount)
     sound.pause()
-  } else {
+  } else if(snowglobe.params.music && audioCount == 1) {
     if (!sound.isPlaying) {
       sound.play()
     }
   }
+  stats.update()
 }
-// AUDIO
-if (snowglobe.params.music) {
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
-
-  var sound = new THREE.Audio(listener);
-  var audioLoader = new THREE.AudioLoader();
-  var isAudioLoaded = false;
-  var isAudioPlaying = false;
-
-  function loadAudio() {
-    audioLoader.load('./assets/song.mp3', function (buffer) {
-      sound.setBuffer(buffer);
-      sound.setLoop(true);
-      sound.setVolume(0.2);
-      sound.stop()
-      if (!sound.isPlaying) {
-      sound.play()
-      }
-      isAudioLoaded = true;
-    });
-  }
-loadAudio();
 animate();
 var save_speed = 100;
 
@@ -430,4 +439,4 @@ document.addEventListener("keyup", function (event) {
   //   }
   // }
 //   // snowglobe.scene.addEventListener('click', playAudio);
-}
+
