@@ -349,7 +349,37 @@ function animate() {
 
 
   stats.update()
+  if (!snowglobe.params.music) {
+    sound.pause()
+  } else {
+    if (!sound.isPlaying) {
+      sound.play()
+    }
+  }
 }
+// AUDIO
+if (snowglobe.params.music) {
+  var listener = new THREE.AudioListener();
+  camera.add(listener);
+
+  var sound = new THREE.Audio(listener);
+  var audioLoader = new THREE.AudioLoader();
+  var isAudioLoaded = false;
+  var isAudioPlaying = false;
+
+  function loadAudio() {
+    audioLoader.load('assets/song.mp3', function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(0.2);
+      sound.stop()
+      if (!sound.isPlaying) {
+      sound.play()
+      }
+      isAudioLoaded = true;
+    });
+  }
+loadAudio();
 animate();
 var save_speed = 100;
 
@@ -380,32 +410,27 @@ document.addEventListener("keyup", function (event) {
   };
 });
 
-// // AUDIO
-if (snowglobe.params.music) {
-  var listener = new THREE.AudioListener();
-  camera.add(listener);
+// const listener = new THREE.AudioListener();
+// camera.add( listener );
 
-  var sound = new THREE.Audio(listener);
-  var audioLoader = new THREE.AudioLoader();
-  var isAudioLoaded = false;
-  var isAudioPlaying = false;
+// // create a global audio source
+// const sound = new THREE.Audio( listener );
+// sound.hasPlaybackControl = true
 
-  function loadAudio() {
-    audioLoader.load('assets/song.mp3', function (buffer) {
-      sound.setBuffer(buffer);
-      sound.setLoop(true);
-      sound.setVolume(0.2);
-      isAudioLoaded = true;
-    });
-  }
+// // load a sound and set it as the Audio object's buffer
+// const audioLoader = new THREE.AudioLoader();
+// audioLoader.load( 'assets/song.mp3', function( buffer ) {
+// 	sound.setBuffer( buffer );
+// 	sound.setLoop( true );
+// 	sound.setVolume( 0.2 );
+// 	sound.pause();
+// });
 
-  function playAudio() {
-    if (isAudioLoaded && !isAudioPlaying) {
-      sound.play();
-      isAudioPlaying = true;
-    }
-  }
-
-  loadAudio();
-  snowglobe.addEventListener('click', playAudio);
+  // function playAudio() {
+  //   if (isAudioLoaded && !isAudioPlaying) {
+  //     sound.play();
+  //     isAudioPlaying = true;
+  //   }
+  // }
+//   // snowglobe.scene.addEventListener('click', playAudio);
 }
